@@ -43,9 +43,10 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(org-agenda-files nil)
  '(package-selected-packages
    (quote
-    (helm yasnippet smart-tabs-mode nodejs-repl multiple-cursors auto-complete ac-js2))))
+    (ac-emmet babel helm yasnippet smart-tabs-mode nodejs-repl multiple-cursors auto-complete ac-js2))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

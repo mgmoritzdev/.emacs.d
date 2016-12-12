@@ -1,0 +1,60 @@
+#+TITLE: Basic code evaluation in orgmode
+#+AUTHOR: Marcos Moritz
+#+DATE: [2016-12-11 Dom]
+
+* Basics
+  The code block starts with #+BEGIN_SRC and ends with #+END_SRC
+#+BEGIN_SRC elisp :results scalar
+  (defun sample-function(arg)
+    (+ 10 arg))
+  (sample-function 15)
+#+END_SRC
+
+#+RESULTS:
+: 25
+
+
+** Python
+   A simple python execution
+
+   #+BEGIN_SRC python :results output
+     a = 12
+     b = 20
+     print a + b
+   #+END_SRC
+
+   #+RESULTS:
+   : 32
+
+** HTML
+   Evaluates HTML into an image and displays the image. The :out property is needed.
+#+BEGIN_SRC browser :out demo.png
+  <h1>Pretty</h1>
+  <p>Tristique sollicitudin nibh sit amet commodo nulla facilisi nullam vehicula ipsum a arcu cursus vitae congue mauris rhoncus aenean vel elit. Varius quam quisque id diam vel quam elementum pulvinar!</p>
+  <p>Tristique sollicitudin nibh sit amet commodo nulla facilisi nullam vehicula ipsum a arcu cursus vitae congue mauris rhoncus aenean vel elit. Varius quam quisque id diam vel quam elementum pulvinar!</p>
+  <p>Tristique sollicitudin nibh sit amet commodo nulla facilisi nullam vehicula ipsum a arcu cursus vitae congue mauris rhoncus aenean vel elit. Varius quam quisque id diam vel quam elementum pulvinar!</p>
+#+END_SRC
+
+#+RESULTS:
+[[file:demo.png]]
+
+* Using the execution result
+  I can use the result of a block in other block as parameter.
+
+  #+NAME: thirtyTwo
+  #+BEGIN_SRC python :results scalar
+     a = 12
+     b = 20
+     return a + b
+  #+END_SRC
+
+  #+RESULTS: thirtyTwo
+  : 32
+
+  #+BEGIN_SRC python :var previousResult=thirtyTwo :results scalar
+    return 10 + int(previousResult)
+  #+END_SRC
+
+  #+RESULTS:
+  : 42
+

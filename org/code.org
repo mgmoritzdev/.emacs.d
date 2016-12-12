@@ -1,0 +1,69 @@
+#+TITLE: Just Testing Shell Script in Linux
+#+AUTHOR: Marcos Moritz
+#+DATE: [2016-12-10 Sáb]
+#+TODO: TODO(t) | DONE(d) CANCELED(c)
+
+* Problem
+  The shell/sh/bash/whatever do not run in linux
+
+  A code as simple as that don't run with default config.
+
+#+BEGIN_SRC shell :exports both :results output
+  ls
+#+END_SRC
+
+#+RESULTS:
+: code.org
+: demo.png
+
+* Poking around
+** Incompatibility
+   Incompatible versions of org and emacs. So I reinstalled org mode as suggested by some threads in stack-overflow. It did not work.
+
+#+BEGIN_SRC emacs-lisp
+(emacs-version)
+#+END_SRC
+
+#+RESULTS:
+: GNU Emacs 26.0.50.2 (x86_64-pc-linux-gnu, GTK+ Version 3.10.8)
+:  of 2016-10-25
+
+
+#+BEGIN_SRC emacs-lisp
+(org-version nil t)
+#+END_SRC
+
+#+RESULTS:
+: Org mode version 9.0.1 (9.0.1-elpa @ /home/marcos/.emacs.d/elpa/org-20161118/)
+
+** Shell or sh
+   [[https://lists.gnu.org/archive/html/emacs-orgmode/2015-02/msg00813.html][This]] thread suggested that shell has replaced sh recently in babel. The error I was getting was something like this:
+   
+   org-babel-execute:shell: Wrong number of arguments: #[(session body &optional params stdin) [... binary code cut ...]
+
+   In the rest of the error message there was a reference to /usr/share/emacs/26.0.50/lisp/org/ob-sh.el, the file in the built-in installation. The alarm was firing.
+
+* Solution
+** Replacing the code
+   I started emacs with the option -q
+
+   #+BEGIN_SRC shell :results none
+     emacs -q
+   #+END_SRC
+
+   Then I installed org from ELPA.
+   I replace the code of the built-in version of or with my fresh install in ~/.emacs.d/elpa/org-20161118/ and it worked!
+
+   This solution is similar to [[http://sachachua.com/blog/2014/05/update-org-7-comes-emacs-org-8-configuration-better-exports/][this one]]. In the case it fails in the future, it may be required to update the init.el like this:
+
+   #+NAME: init.el
+   #+BEGIN_SRC elisp
+     (package-initialize)
+     (setq package-enable-at-startup nil)
+   #+END_SRC
+
+** Documenting solution
+   And I started documenting my tries and put back the old files to reproduce the error and it's not there.
+
+* Future
+  This file will be availabe to redo the steps if necessary.
