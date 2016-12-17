@@ -7,20 +7,13 @@
 
 (load "~/.emacs.d/archives")
 
-(load-theme 'wombat)
-(column-number-mode)
-
 (require 'iso-transl)
 
-(setq inhibit-splash-screen t)
-
-(prefer-coding-system 'utf-8)
-(require 'yasnippet)
-(yas-global-mode 1)
+;; linux only
 (setq x-select-enable-clipboard-manager nil)
 
-
 ;;(define-key key-translation-map [dead-tilde] "~")
+(load "~/.emacs.d/basic")
 (load "~/.emacs.d/babel")
 (load "~/.emacs.d/dired")
 (load "~/.emacs.d/smart-tabs")
@@ -30,7 +23,15 @@
 (load "~/.emacs.d/bookmark")
 (load "~/.emacs.d/orgmode")
 (load "~/.emacs.d/comint")
+(load "~/.emacs.d/mini-buffer")
 (load "~/.emacs.d/nodejs-repl-eval")
+
+(load "~/.emacs.d/magit")
+(load "~/.emacs.d/prettify-symbols")
+(load "~/.emacs.d/highlight")
+(load "~/.emacs.d/yasnippet")
+
+(add-to-list 'load-path "~/.emacs/elpa/darkroom")
 
 (when (<= 26 emacs-major-version)
   (load "~/.emacs.d/multiple-cursors"))
@@ -46,7 +47,7 @@
  '(org-agenda-files nil)
  '(package-selected-packages
    (quote
-    (ac-emmet babel helm yasnippet smart-tabs-mode nodejs-repl multiple-cursors auto-complete ac-js2))))
+    (magit-popup magit highlight-parentheses ac-emmet babel helm yasnippet smart-tabs-mode nodejs-repl multiple-cursors auto-complete ac-js2))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
