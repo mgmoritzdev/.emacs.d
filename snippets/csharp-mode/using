@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: using
+# key: using
+# --
+using(var ${1:obj} = new ${2:Objec()}) {
+          $0
+}

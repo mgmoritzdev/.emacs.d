@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: shell
+# key: sh_
+# --
+${1: #+NAME: ${2:Name}}
+#+BEGIN_SRC shell${3:${4: :results ${5:output}}${6: :export ${7:both}}${8: :dir ${9:../sql}}}
+            ${0:ls}
+            exit
+#+END_SRC

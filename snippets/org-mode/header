@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: header
+# key: head_
+# --
+#+TITLE: $1
+#+AUTHOR: ${2:Marcos Moritz}
+#+DATE: ${3: C-c !}
+#+TODO: TODO(t) | DONE(d) CANCELED(c)
+
+$0

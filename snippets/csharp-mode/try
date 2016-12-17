@@ -1,0 +1,9 @@
+# -*- mode: csharp-mode -*-
+# name: try
+# key: try
+# --
+try {
+    $0
+} catch ${1:(Exception ex)} {
+
+}

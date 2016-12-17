@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: sql
+# key: sql_
+# --
+#+NAME: scratch
+#+BEGIN_SRC sql ${1::tangle ${2:../sql/scratch.sql}}
+            $0
+#+END_SRC
+

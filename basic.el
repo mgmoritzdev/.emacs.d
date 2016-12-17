@@ -7,3 +7,4 @@
 (prefer-coding-system 'utf-8)
 (setq inhibit-splash-screen t)
 (setq visible-bell t)
+(require 'iso-transl)

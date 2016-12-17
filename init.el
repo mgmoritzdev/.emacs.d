@@ -7,8 +7,6 @@
 
 (load "~/.emacs.d/archives")
 
-(require 'iso-transl)
-
 ;; linux only
 (setq x-select-enable-clipboard-manager nil)
 
@@ -25,7 +23,6 @@
 (load "~/.emacs.d/comint")
 (load "~/.emacs.d/mini-buffer")
 (load "~/.emacs.d/nodejs-repl-eval")
-
 (load "~/.emacs.d/magit")
 (load "~/.emacs.d/prettify-symbols")
 (load "~/.emacs.d/highlight")
