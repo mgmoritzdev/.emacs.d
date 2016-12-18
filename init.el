@@ -23,20 +23,15 @@
 (load "~/.emacs.d/bookmark")
 (load "~/.emacs.d/orgmode")
 (load "~/.emacs.d/comint")
-(load "~/.emacs.d/mini-buffer")
 (load "~/.emacs.d/nodejs-repl-eval")
 (load "~/.emacs.d/magit")
+(load "~/.emacs.d/mini-buffer")
+(load "~/.emacs.d/multiple-cursors")
 (load "~/.emacs.d/prettify-symbols")
 (load "~/.emacs.d/highlight")
 (load "~/.emacs.d/yasnippet")
 (load "~/.emacs.d/darkroom")
 
-
-(when (<= 26 emacs-major-version)
-  (load "~/.emacs.d/multiple-cursors"))
-
-(when (<= 25 emacs-major-version)
-  (load "~/.emacs.d/mini-buffer"))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
