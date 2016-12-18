@@ -5,18 +5,16 @@
 
 (setq org-default-notes-file (concat "~/.emacs.d/org" "/notes.org"))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ORG BULLETS try...
 
+;; Org bullets, doesn't fit well in windows
+(when linux-p
+  (require 'org-bullets)
+  (set-fontset-font "fontset-default"
+                    'greek (font-spec :family "Fira Mono") nil 'prepend)
+  (set-fontset-font "fontset-default" '(#x1f601 . #x1f567) "Symbola")
 
-;; (set-fontset-font "fontset-default"
-;;                   'greek (font-spec :family "Fira Mono") nil 'prepend)
-;; (set-fontset-font "fontset-default" '(#x1f601 . #x1f567) "Symbola")
+  (setq org-bullets-face-name "Inconsolata-12")
+  (setq org-bullets-bullet-list
+        '("◉" "◎" "⚫" "○" "►" "◇"))
 
-;; (setq org-bullets-face-name "Inconsolata-12")
-;; (setq org-bullets-bullet-list
-;;       '("◉" "◎" "⚫" "○" "►" "◇"))
-
-;;(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))

@@ -3,9 +3,8 @@
 ;; installed packages.  Don't delete this line.  If you don't want it,
 ;; just comment it out by adding a semicolon to the start of the line.
 ;; You may delete these explanatory comments.
-;;(package-initialize)
+(package-initialize)
 
-(load "~/.emacs.d/archives")
 (defvar mswindows-p (string-match "windows" (symbol-name system-type)))
 (defvar linux-p (string-match "linux" (symbol-name system-type)))
 
@@ -13,9 +12,11 @@
 (setq x-select-enable-clipboard-manager nil)
 
 ;;(define-key key-translation-map [dead-tilde] "~")
-(load "~/.emacs.d/basic")
+(load "~/.emacs.d/archives")
 (load "~/.emacs.d/babel")
+(load "~/.emacs.d/basic")
 (load "~/.emacs.d/dired")
+(load "~/.emacs.d/fontface")
 (load "~/.emacs.d/smart-tabs")
 (load "~/.emacs.d/ac")
 (load "~/.emacs.d/js2")
@@ -41,7 +42,7 @@
  '(org-agenda-files nil)
  '(package-selected-packages
    (quote
-    (magit-popup magit highlight-parentheses ac-emmet babel helm yasnippet smart-tabs-mode nodejs-repl multiple-cursors auto-complete ac-js2))))
+    (org-bullets flycheck json-mode magit-popup magit highlight-parentheses ac-emmet babel helm yasnippet smart-tabs-mode nodejs-repl multiple-cursors auto-complete ac-js2))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
