@@ -6,6 +6,8 @@
 ;;(package-initialize)
 
 (load "~/.emacs.d/archives")
+(defvar mswindows-p (string-match "windows" (symbol-name system-type)))
+(defvar linux-p (string-match "linux" (symbol-name system-type)))
 
 ;; linux only
 (setq x-select-enable-clipboard-manager nil)
