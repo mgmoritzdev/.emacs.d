@@ -29,8 +29,8 @@
 (load "~/.emacs.d/prettify-symbols")
 (load "~/.emacs.d/highlight")
 (load "~/.emacs.d/yasnippet")
+(load "~/.emacs.d/darkroom")
 
-(add-to-list 'load-path "~/.emacs/elpa/darkroom")
 
 (when (<= 26 emacs-major-version)
   (load "~/.emacs.d/multiple-cursors"))
