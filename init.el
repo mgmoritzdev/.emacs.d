@@ -1,3 +1,4 @@
+(load "~/.emacs.d/org-defface.el")
 
 ;; Added by Package.el.  This must come before configurations of
 ;; installed packages.  Don't delete this line.  If you don't want it,
@@ -21,7 +22,7 @@
 (load "~/.emacs.d/ac")
 (load "~/.emacs.d/js2")
 (load "~/.emacs.d/kbd-macros")
-(load "~/.emacs.d/bookmark")
+;;(load "~/.emacs.d/bookmark")
 (load "~/.emacs.d/orgmode")
 (load "~/.emacs.d/comint")
 (load "~/.emacs.d/nodejs-repl-eval")
@@ -32,7 +33,7 @@
 (load "~/.emacs.d/highlight")
 (load "~/.emacs.d/yasnippet")
 (load "~/.emacs.d/darkroom")
-
+(load "~/.emacs.d/expand-region")
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -42,7 +43,7 @@
  '(org-agenda-files nil)
  '(package-selected-packages
    (quote
-    (org-bullets flycheck json-mode magit-popup magit highlight-parentheses ac-emmet babel helm yasnippet smart-tabs-mode nodejs-repl multiple-cursors auto-complete ac-js2))))
+    (expand-region cider org-bullets flycheck json-mode magit-popup magit highlight-parentheses ac-emmet babel helm yasnippet smart-tabs-mode nodejs-repl multiple-cursors auto-complete ac-js2))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

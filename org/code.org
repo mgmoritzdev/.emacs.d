@@ -8,33 +8,35 @@
 
   A code as simple as that don't run with default config.
 
-#+BEGIN_SRC shell :exports both :results output
+  #+BEGIN_SRC shell :exports both :results output
   ls
-#+END_SRC
+  #+END_SRC
 
-#+RESULTS:
-: code.org
-: demo.png
+  #+RESULTS:
+  : code.org
+  : demo.png
+  : literate.org
+  : schedule.org
 
 * Poking around
 ** Incompatibility
    Incompatible versions of org and emacs. So I reinstalled org mode as suggested by some threads in stack-overflow. It did not work.
 
-#+BEGIN_SRC emacs-lisp
-(emacs-version)
-#+END_SRC
+   #+BEGIN_SRC emacs-lisp
+     (emacs-version)
+   #+END_SRC
 
-#+RESULTS:
-: GNU Emacs 26.0.50.2 (x86_64-pc-linux-gnu, GTK+ Version 3.10.8)
-:  of 2016-10-25
+   #+RESULTS:
+   : GNU Emacs 26.0.50.2 (x86_64-pc-linux-gnu, GTK+ Version 3.10.8)
+   :  of 2016-10-25
 
 
-#+BEGIN_SRC emacs-lisp
-(org-version nil t)
-#+END_SRC
+   #+BEGIN_SRC emacs-lisp
+     (org-version nil t)
+   #+END_SRC
 
-#+RESULTS:
-: Org mode version 9.0.1 (9.0.1-elpa @ /home/marcos/.emacs.d/elpa/org-20161118/)
+   #+RESULTS:
+   : Org mode version 9.0.1 (9.0.1-elpa @ /home/marcos/.emacs.d/elpa/org-20161118/)
 
 ** Shell or sh
    [[https://lists.gnu.org/archive/html/emacs-orgmode/2015-02/msg00813.html][This]] thread suggested that shell has replaced sh recently in babel. The error I was getting was something like this:

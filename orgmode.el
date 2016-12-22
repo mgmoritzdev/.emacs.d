@@ -1,10 +1,16 @@
+(require 'color)
+(set-face-attribute 'org-block nil :background "#222250" :foreground "#666666")
+
+(setq org-src-block-faces '(("emacs-lisp" (:foreground "#666666" :background "#222250"))
+                            ("python" (:background "#E5FFB8"))))
+
+
 (global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-ca" 'org-agenda)
 (global-set-key "\C-cc" 'org-capture)
 (global-set-key "\C-cb" 'org-iswitchb)
 
 (setq org-default-notes-file (concat "~/.emacs.d/org" "/notes.org"))
-
 
 ;; Org bullets, doesn't fit well in windows
 (when linux-p

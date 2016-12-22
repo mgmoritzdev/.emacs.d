@@ -58,3 +58,65 @@
   #+RESULTS:
   : 42
 
+* Color for code blocks
+  I'm using one strategy to color the begin/end lines and another to color the code block. The options I found online doesn't work properly.
+
+  #+NAME: init.el
+  #+begin_src emacs-lisp
+    (setq org-src-fontify-natively t)
+  #+end_src
+
+  Add to current color theme
+  #+begin_src emacs-lisp
+    (org-block-begin-line
+     ((t (:underline "#A7A6AA" :foreground "#008ED1" :background "#EAEAFF"))))
+    (org-block-background
+     ((t (:background "#FFFFEA"))))
+    (org-block-end-line
+     ((t (:overline "#A7A6AA" :foreground "#008ED1" :background "#EAEAFF"))))
+  #+end_src
+
+  Define before requiring org if you don't have your own color theme.
+  #+NAME: init.el
+  #+begin_src emacs-lisp
+    (defface org-block-begin-line
+      '((t (:underline "#A7A6AA" :foreground "#008ED1" :background "#EAEAFF")))
+      "Face used for the line delimiting the begin of source blocks.")
+
+    ;; Does not work in current version of orgmode!
+    ;; (defface org-block-background
+    ;;   '((t (:background "#FFFFEA")))
+    ;;   "Face used for the source block background.")
+
+    (defface org-block-end-line
+      '((t (:overline "#A7A6AA" :foreground "#008ED1" :background "#EAEAFF")))
+      "Face used for the line delimiting the end of source blocks.")
+  #+end_src
+
+  #+RESULTS: init.el
+  : t
+
+
+  In the config file, change the background color of the block
+  #+NAME: orgmode.el
+  #+begin_src emacs-lisp
+    (require 'color)
+    (set-face-attribute 'org-block nil :background "#222266" :foreground "#666666")
+
+    ;; To add special color config to a language use this
+    ;; (setq org-src-block-faces '(("emacs-lisp" (:foreground "#666666" :background "#222266"))
+    ;;                             ("python" (:background "#E5FFB8"))))
+
+  #+end_src
+
+
+  It applies to all languages
+  #+begin_src js
+    var a = 10;
+    var b = a + 10;
+
+    return b;
+  #+end_src
+
+  #+RESULTS:
+  : 20
