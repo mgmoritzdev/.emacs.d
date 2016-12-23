@@ -17,6 +17,7 @@
 (load "~/.emacs.d/babel")
 (load "~/.emacs.d/basic")
 (load "~/.emacs.d/dired")
+(load "~/.emacs.d/flycheck")
 (load "~/.emacs.d/fontface")
 (load "~/.emacs.d/smart-tabs")
 (load "~/.emacs.d/ac")
