@@ -4,7 +4,7 @@
 
 * Basics
   The code block starts with #+BEGIN_SRC and ends with #+END_SRC
-  #+BEGIN_SRC elisp :results scalar
+  #+BEGIN_SRC emacs-lisp :results scalar
     (defun sample-function(arg)
       (+ 10 arg))
     (sample-function 15)
@@ -103,9 +103,9 @@
     (require 'color)
     (set-face-attribute 'org-block nil :background "#222266" :foreground "#666666")
 
-    ;; To add special color config to a language use this
-    ;; (setq org-src-block-faces '(("emacs-lisp" (:foreground "#666666" :background "#222266"))
-    ;;                             ("python" (:background "#E5FFB8"))))
+    To add special color config to a language use this
+    (setq org-src-block-faces '(("shell" (:foreground "#666666" :background "#300030"))
+                                ("sh" (:foreground "#666666" :background "#300030"))))
 
   #+end_src
 
@@ -120,3 +120,5 @@
 
   #+RESULTS:
   : 20
+
+ 
