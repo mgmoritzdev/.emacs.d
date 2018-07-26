@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: insert expense
+# key: enforce_
+# --
+(enforce-agenda-add-action "${1:name}"
+                           "${2:9:40am}"
+                           '${3:function}
+                           "${4:argument1}")

@@ -1,0 +1,1682 @@
+#+TITLE: Emacs Config in a Org File
+#+AUTHOR: Marcos Moritz
+#+DATE: [2017-03-18 Sáb]
+
+* Basic Configuration
+** OS var definition
+
+#+begin_src emacs-lisp
+  (defvar mswindows-p (string-match "windows" (symbol-name system-type)))
+  (defvar linux-p (string-match "linux" (symbol-name system-type)))
+#+end_src
+
+** Use Package
+
+#+begin_src emacs-lisp
+  (unless (package-installed-p 'use-package)
+    (package-refresh-contents)
+    (package-install 'use-package))
+#+end_src
+
+** Visual
+*** Themes
+**** Wombat
+     Not so high contrast, comes with emacs, clean interface. No font resize and no highlighting in source code in org mode.
+
+     #+begin_src emacs-lisp
+       ;; (load-theme 'wombat)
+     #+end_src
+
+**** Cyberpunk
+     Very high contrast, text resize and code block highlighting in org mode. Custom theme and requires permission to run.
+
+     #+begin_src emacs-lisp
+       ;; (use-package cyberpunk-theme
+       ;;   :ensure t
+       ;;   :config
+       ;;   (load-theme 'cyberpunk))
+     #+end_src
+
+**** Solarized
+     Good balance of colors, medium contrast, text resize but no code highlighting in org mode. Custom theme and requires permission to run.
+
+     #+begin_src emacs-lisp
+       ;; (use-package solarized-theme
+       ;;   :ensure t
+       ;;   :config
+       ;;   (load-theme 'solarized-dark))
+     #+end_src
+
+**** Gran Shell
+     #+begin_src emacs-lisp
+       (use-package grandshell-theme
+         :ensure t
+         :config
+         (load-theme 'grandshell t))
+     #+end_src
+**** Dracula
+     #+BEGIN_SRC emacs-lisp
+       ;; (use-package dracula-theme
+       ;;   :ensure t
+       ;;   :config
+       ;;   (load-theme 'dracula t))
+     #+END_SRC
+*** Powerline
+    #+BEGIN_SRC emacs-lisp
+      (use-package powerline
+        :ensure t
+        :init
+        (powerline-default-theme)
+        (column-number-mode))
+
+      (use-package smart-mode-line
+        :ensure t
+        :init
+        (require 'powerline)
+        (powerline-revert)
+        (setq sml/theme 'dark)
+        (setq sml/no-confirm-load-theme t)
+        (sml/setup))
+    #+END_SRC
+*** Prettify Simbols
+**** JS2
+
+#+begin_src emacs-lisp
+  (defun js2-pretty-symbols ()
+    "Make some word or string show as pretty Unicode symbols for \"js2-mode\"."
+    (setq prettify-symbols-alist
+          '(
+            ("lambda" . 955)   ; λ
+            ("->" . 8594)      ; →
+            ("=>" . 10132)      ;	➔
+            ("function" . 402) ; ƒ
+            ))
+    (prettify-symbols-mode))
+
+  (add-hook 'js2-mode-hook 'js2-pretty-symbols)
+#+end_src
+**** Python
+
+#+begin_src emacs-lisp
+  (defun python-pretty-symbols ()
+    "Make some word or string show as pretty Unicode symbols for \"python-mode\"."
+    (setq prettify-symbols-alist
+          '(
+            ("lambda" . 955)   ; λ
+            ("->" . 8594)      ; →
+            ))
+    (prettify-symbols-mode))
+
+  (add-hook 'python-mode-hook 'python-pretty-symbols)
+#+end_src
+
+**** Emacs Lisp
+
+#+begin_src emacs-lisp
+  (defun emacs-lisp-pretty-symbols ()
+    "Make some word or string show as pretty Unicode symbols for \"emacs-lisp-mode\"."
+    (setq prettify-symbols-alist
+          '(
+            ("lambda" . 955)   ; λ
+            ))
+    (prettify-symbols-mode))
+
+  (add-hook 'emacs-lisp-mode-hook 'emacs-lisp-pretty-symbols)
+#+end_src
+
+**** Org
+     Removed because it demands some coloring around the code block, and not all color themes have it. I want to be free to choose the best choose the best color theme without this concern.
+
+#+begin_src emacs-lisp
+  (defun org-pretty-symbols ()
+    "Make some word or string show as pretty Unicode symbols for \"org-mode\"."
+    (setq prettify-symbols-alist
+          '(
+            ("lambda" . 955)      ; λ
+            ("sigma" . 963)       ; σ
+            ))
+    (prettify-symbols-mode))
+
+  (add-hook 'org-mode-hook 'org-pretty-symbols)
+#+end_src
+
+**** Chess
+     This doesn't work
+     #+begin_src emacs-lisp
+       (defun chessboard-pretty-symbols ()
+         "Make some word or string show as pretty Unicode symbols for \"chessboard-mode\"."
+         (setq prettify-symbols-alist
+               '(
+                 ("K" . 9812)      ; white king
+                 ("Q" . 9813)      ; white queen
+                 ("R" . 9814)      ; white rook
+                 ("B" . 9815)      ; white bishop
+                 ("N" . 9816)      ; white knight
+                 ("P" . 9817)      ; white pawn
+                 ("k" . 9818)      ; black king
+                 ("q" . 9819)      ; black queen
+                 ("r" . 9820)      ; black rook
+                 ("b" . 9821)      ; black bishop
+                 ("n" . 9822)      ; black knight
+                 ("p" . 9823)      ; black pawn
+                 ))
+         (prettify-symbols-mode))
+
+       ;(add-hook 'chessboard-mode-hook 'chessboard-pretty-symbols)
+
+     #+end_src
+
+*** Highlight parentheses
+
+#+begin_src emacs-lisp
+  (use-package highlight-parentheses
+    :ensure t
+    :diminish 'highlight-parentheses-mode
+    :config
+    (define-globalized-minor-mode global-highlight-parentheses-mode
+      highlight-parentheses-mode
+      (lambda ()
+        (highlight-parentheses-mode t)))
+    (global-highlight-parentheses-mode t))
+#+end_src
+
+*** Beacon
+    Animation to find cursor quickly
+
+#+begin_src emacs-lisp
+  (use-package beacon
+    :ensure t
+    :config
+    (beacon-mode 1))
+
+
+#+end_src
+
+*** Sqlup
+    #+begin_src emacs-lisp
+      (use-package sqlup-mode
+        :ensure t
+        :config
+        (add-hook 'sql-mode-hook 'sqlup-mode))
+    #+end_src
+** Setup start screen
+
+#+begin_src emacs-lisp
+  (setq inhibit-startup-message t)
+  (setq initial-scratch-message "")
+#+end_src
+
+** Remove toolbars
+
+#+begin_src emacs-lisp
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+
+  (when window-system
+    (scroll-bar-mode -1)
+    (tooltip-mode -1))
+#+end_src
+
+** y-or-n
+   Make it simpler, use y-or-n instead of yes-or-no
+
+#+begin_src emacs-lisp
+  (fset 'yes-or-no-p 'y-or-n-p)
+#+end_src
+
+** Prefer UTF-8
+
+#+begin_src emacs-lisp
+  (setq locale-coding-system 'utf-8)
+  (set-terminal-coding-system 'utf-8)
+  (set-keyboard-coding-system 'utf-8)
+  (set-selection-coding-system 'utf-8)
+  (prefer-coding-system 'utf-8)
+#+end_src
+
+** Silent the bell
+
+#+begin_src emacs-lisp
+(setq inhibit-splash-screen t)
+(setq visible-bell t)
+#+end_src
+** Diminish
+#+BEGIN_SRC emacs-lisp
+  (use-package diminish
+    :ensure t
+    :config
+    (diminish 'auto-revert-mode)
+    (diminish 'electric-indent-mode))
+#+END_SRC
+
+** Iso-trans
+   Source code [[https://github.com/jwiegley/emacs-release/blob/master/lisp/international/iso-transl.el][here]].
+   #+begin_src emacs-lisp
+     (require 'iso-transl)
+   #+end_src
+
+** File navegation
+
+*** Dired
+**** Hide details in dired by default
+     #+begin_src emacs-lisp
+       (defun xah-dired-mode-setup ()
+         "to be run as hook for `dired-mode'."
+         (dired-hide-details-mode 1))
+       (add-hook 'dired-mode-hook 'xah-dired-mode-setup)
+     #+end_src
+**** Dired filter
+     #+BEGIN_SRC emacs-lisp
+       (use-package dired-filter
+         :ensure t
+         :config
+         (add-hook 'dired-mode-hook 'dired-filter-mode))
+     #+END_SRC
+*** Neotree
+
+#+begin_src emacs-lisp
+  (use-package neotree
+    :ensure t
+    :config
+    :bind ([f8] . neotree-toggle))
+
+#+end_src
+
+*** Change window
+    I can change the buffer in the current window using "C-x <arrow>", to be consistent, I want to bind "C-c <arrow>" to change the window (same as "C-x o").
+
+    Advantages:
+    - It's intuitive because of "\C-x <arrow>" used to navigate throughout the buffers in the same window.
+    - "C-x o" is error prone, it's easy to type "C-x C-o" and it doesn't work. I'm adding both "C-c <arrow>" and "C-c C-<arrow>".
+    - You can go to a window in another frame.
+    - When you have many windows you can go back when you go beyond the desired window.
+    - Replaces well a window navegation extension like windmove, ace-window and ace-jump.
+
+    Disadvantages:
+    - May require many operations to reach the desired window.
+
+#+begin_src emacs-lisp
+  (global-set-key (kbd "\C-c <left>") 'previous-multiframe-window)
+  (global-set-key (kbd  "\C-c <right>") 'next-multiframe-window)
+  (global-set-key (kbd "\C-c C-<left>") 'previous-multiframe-window)
+  (global-set-key (kbd  "\C-c C-<right>") 'next-multiframe-window)
+#+end_src
+*** Avy (ace-jump)
+
+#+begin_src emacs-lisp
+  (use-package avy
+    :ensure t
+    :config
+    :bind ("C-c j" . 'avy-goto-word-or-subword-1))
+#+end_src
+** Backup Directory
+    Change backup directory to system's temporary directory
+
+ #+begin_src emacs-lisp
+   (setq backup-directory-alist
+         `((".*" . ,temporary-file-directory)))
+   (setq auto-save-file-name-transforms
+         `((".*" ,temporary-file-directory t)))
+ #+end_src
+** eww
+   #+begin_src emacs-lisp
+     (setq eww-search-prefix "https://duckduckgo.com/html/?kd=-1&q=")
+   #+end_src
+** emms
+   Play music
+
+   #+begin_src emacs-lisp
+     (use-package emms
+       :ensure t
+       :config
+
+       (require 'emms-setup)
+       (require 'emms-player-mplayer)
+       (emms-standard)
+       (emms-default-players)
+
+       (define-emms-simple-player mplayer '(file url)
+         (regexp-opt '(".ogg" ".mp3" ".wav" ".mpg" ".mpeg" ".wmv" ".wma"
+                       ".mov" ".avi" ".divx" ".ogm" ".asf" ".mkv" "http://" "mms://"
+                       ".rm" ".rmvb" ".mp4" ".flac" ".vob" ".m4a" ".flv" ".ogv" ".pls"
+                       ".m3u" ".opus"))
+         "mplayer" "-slave" "-quiet" "-really-quiet" "-fullscreen"))
+   #+end_src
+** emacs-async
+  #+begin_src emacs-lisp
+    (use-package async
+      :ensure t)
+  #+end_src
+** drag-stuff
+   #+begin_src emacs-lisp
+     (use-package drag-stuff
+       :ensure t
+       :diminish 'drag-stuff-mode
+       :config
+       ;;(drag-stuff-global-mode 1)
+       (add-hook 'js2-mode-hook 'drag-stuff-mode)
+       (add-hook 'python-mode-hook 'drag-stuff-mode)
+       (add-hook 'omnisharp-mode-hook 'drag-stuff-mode)
+       (drag-stuff-define-keys))
+   #+end_src
+** gnus email
+   Set the email address and the full name in [[file:local.org::*Variables][local.org]].
+   #+begin_src emacs-lisp
+     ;; Set this in local.org
+     ;; (setq user-mail-address "<my-email-address>"
+     ;;       user-full-name "<My name>")
+
+     (setq gnus-select-method
+           '(nnimap "gmail"
+                    (nnimap-address "imap.gmail.com")  ; it could also be imap.googlemail.com if that's your server.
+                    (nnimap-server-port "imaps")
+                    (nnimap-stream ssl)))
+
+     (setq smtpmail-smtp-server "smtp.gmail.com"
+           smtpmail-smtp-service 587
+           gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
+
+     (setq send-mail-function 'smtpmail-send-it)
+     (setq shr-color-visible-luminance-min 70)
+   #+end_src
+** Ace Window
+   #+begin_src emacs-lisp
+     (use-package ace-window
+       :ensure t
+       :config
+       (setq aw-keys '(?a ?s ?d ?f ?j ?k ? l ?ç))
+       :bind
+       ("M-p" . ace-window)
+       ("C-c s" . ace-swap-window))
+
+   #+end_src
+** Before save hook
+   #+begin_src emacs-lisp
+     (add-hook 'before-save-hook 'delete-trailing-whitespace)
+   #+end_src
+** Bookmarks
+   #+begin_src emacs-lisp
+     (require 'bookmark)
+     (bookmark-bmenu-list)
+     (switch-to-buffer "*Bookmark List*")
+   #+end_src
+** Ibuffer
+   #+begin_src emacs-lisp
+     (global-set-key (kbd "C-x C-b") 'ibuffer)
+     (setq ibuffer-saved-filter-groups
+           (quote (("default"
+                    ("dired" (mode . dired-mode))
+                    ("org" (name . "^.*org$"))
+
+                    ("web" (or (mode . web-mode)
+                               (mode . js2-mode)
+                               (mode . html-mode)))
+                    ("shell" (or (mode . eshell-mode) (mode . shell-mode)))
+                    ("mu4e" (name . "\*mu4e\*"))
+                    ("programming" (or
+                                    (mode . python-mode)
+                                    (mode . c++-mode)))
+                    ("emacs" (or
+                              (name . "^\\*scratch\\*$")
+                              (name . "^\\*Messages\\*$")
+                              (name . "^.*el$")))
+                    (".NET" (or
+                             (name . "^.*cs$")
+                             (name . "^.*csproj$")))
+                    ))))
+     (add-hook 'ibuffer-mode-hook
+               (lambda ()
+                 (ibuffer-auto-mode 1)
+                 (ibuffer-switch-to-saved-filter-groups "default")))
+
+     ;; don't show these
+                                             ;(add-to-list 'ibuffer-never-show-predicates "zowie")
+     ;; Don't show filter groups if there are no buffers in that group
+     (setq ibuffer-show-empty-filter-groups nil)
+
+     ;; Don't ask for confirmation to delete marked buffers
+     (setq ibuffer-expert t)
+   #+end_src
+** Hydra
+   #+begin_src emacs-lisp
+     (use-package hydra
+       :ensure t
+       :config
+       (global-set-key (kbd "C-c w")
+                       (defhydra hydra-window-control ()
+                         "Window control"
+                         ("a" ace-window)
+                         ("s" ace-swap-window)
+                         ("j" enlarge-window)
+                         ("k" shrink-window)
+                         ("l" enlarge-window-horizontally)
+                         ("h" shrink-window-horizontally)
+                         ("+" text-scale-increase)
+                         ("=" text-scale-increase)
+                         ("-" text-scale-decrease)
+                         ("0" delete-window)
+                         ("1" delete-other-windows)
+                         ("2" split-window-below)
+                         ("3" split-window-right)))
+       (global-set-key (kbd "C-c e v")
+                       (defhydra hydra-evil-nav ()
+                         "Window control"
+                         ("j" next-line)
+                         ("k" previous-line)
+                         ("h" backward-char)
+                         ("l" forward-char))))
+
+   #+end_src
+** Smex
+   #+BEGIN_SRC emacs-lisp
+     (use-package smex
+       :ensure t)
+   #+END_SRC
+** Kill this buffer
+   #+BEGIN_SRC emacs-lisp
+     (defun moritz/kill-this-buffer ()
+       "Kill buffer without any prompt"
+       (interactive)
+       (kill-buffer (current-buffer)))
+
+     (global-set-key (kbd "C-x k") 'moritz/kill-this-buffer)
+     (global-set-key (kbd "C-x C-k") 'moritz/kill-this-buffer)
+   #+END_SRC
+** Undo Tree
+   #+begin_src emacs-lisp
+     (defun moritz/load-undo-tree ()
+       "Load and config Undo Tree package"
+       (interactive)
+       (use-package undo-tree
+         :diminish 'undo-tree-mode
+         :ensure t
+         :config
+         (global-undo-tree-mode)))
+   #+end_src
+** Projectile
+   #+BEGIN_SRC emacs-lisp
+     (use-package projectile
+       :ensure t
+       :diminish 'projectile-mode
+       :config
+       (projectile-global-mode)
+       (setq projectile-completion-system 'helm)
+       (setq projectile-indexing-method 'alien))
+   #+END_SRC
+* Org
+** Set org-agenda-files recursively
+#+begin_src emacs-lisp
+  (use-package org
+    :ensure t
+    :diminish 'org-indent-mode
+    :config
+    (require 'find-lisp)
+    (require 'cl-lib)
+    (defun moritz/refresh-agenda-files ()
+      "Reloads the list of agenda files"
+      (interactive)
+      (when
+          (file-exists-p "~/workspace/org-files")
+        (load-library "find-lisp")
+        (setq org-agenda-files
+              (cl-remove-if
+               (lambda (haystack)
+                 (string-match-p (regexp-quote "archive") haystack))
+               (cl-remove-if-not
+                (lambda (haystack)
+                  (string-match-p (regexp-quote "agenda") haystack))
+                (find-lisp-find-files "~/workspace/org-files" "\.org$"))))))
+    (moritz/refresh-agenda-files)
+    (add-hook 'ediff-prepare-buffer-hook #'show-all))
+#+end_src
+
+** Babel languages
+Download ditaa jar from [[https://sourceforge.net/projects/ditaa/][sourceforge]]. Find out more information about [[http://ditaa.sourceforge.net/][ditaa]] and [[http://orgmode.org/worg/org-contrib/babel/languages/ob-doc-ditaa.html][ob-ditaa]].
+#+begin_src emacs-lisp
+  (use-package ob-browser
+    :ensure t)
+
+  (use-package ob-http
+    :ensure t)
+
+  (use-package graphviz-dot-mode
+    :ensure t)
+
+  (org-babel-do-load-languages
+   'org-babel-load-languages '((python . t)
+                               (js . t)
+                               (browser . t)
+                               (shell . t)
+                               (http . t)
+                               (sql . t)
+                               (emacs-lisp . t)
+                               (clojure . t)
+                               (latex . t)
+                               (ditaa . t)
+                               (dot . t)
+                               (plantuml . t)))
+  (setq org-ditaa-jar-path "/usr/share/java/ditaa0_9.jar")
+
+
+#+end_src
+
+** Styling
+   Cannot initialize here, it must be done before loading org itself.
+
+ #+begin_src emacs-lisp
+   ;; (setq org-src-fontify-natively t)
+   ;; (defface org-block-begin-line
+   ;;   '((t (:foreground "#666666" :background "#111136")))
+   ;;   "Face used for the line delimiting the begin of source blocks.")
+
+   ;; (defface org-block-end-line
+   ;;   '((t (:foreground "#666666" :background "#111136")))
+   ;;   "Face used for the line delimiting the end of source blocks.")
+ #+end_src
+
+** Key bindings
+
+#+begin_src emacs-lisp
+  ;; *** Key-binding
+  (global-set-key "\C-cl" 'org-store-link)
+  (global-set-key "\C-ca" 'org-agenda)
+  (global-set-key "\C-cc" 'org-capture)
+  (global-set-key "\C-cb" 'org-iswitchb)
+#+end_src
+
+** Log Done
+#+begin_src emacs-lisp
+  (setq org-log-done 'time)
+#+end_src
+** Babel HTML
+
+#+begin_src emacs-lisp
+  (defun http-confirm-babel-evaluate (lang body)
+    "Evaluate LANG queries as defined in BODY."
+    (and
+     (not (string= lang "http"))
+     (not (string= lang "js"))))
+  (setq org-confirm-babel-evaluate 'http-confirm-babel-evaluate)
+
+#+end_src
+
+** Bullets
+
+#+begin_src emacs-lisp
+  ;; *** Org Bullets ***
+  (when linux-p
+    (use-package org-bullets
+      :ensure t
+      :config
+      ;;     (set-fontset-font "fontset-default"
+      ;;                   'greek (font-spec :family "Fira Mono") nil 'prepend)
+      ;; (set-fontset-font "fontset-default" '(#x1f601 . #x1f567) "Symbola")
+
+      ;; (setq org-bullets-face-name "Inconsolata-12")
+      ;; (setq org-bullets-bullet-list
+      ;;       '("◉" "◎" "⚫" "○" "►" "◇"))
+
+      ;; (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+      ))
+
+#+end_src
+
+** TODOs
+
+#+begin_src emacs-lisp
+  ;; *** ToDos ***
+  (setq org-todo-keywords
+        '((sequence "TODO(t)" "WORKING(w)" "HOLD(h)" "|" "DONE(d)" "CANCELED(c)")))
+
+  (setq org-todo-keyword-faces
+        '(("TODO" . org-warning)
+          ("WORKING" . "blue")
+          ("HOLD" . "yellow")
+          ("DONE" . (:foreground "green" :weight bold))
+          ("CANCELED" . "red")))
+
+
+#+end_src
+
+* Editing & Programming
+** C
+   #+begin_src emacs-lisp
+     (c-add-style "moritz"
+                  '("linux"
+                    (c-basic-offset . 4)
+                    (c-offsets-alist . ((inline-open . 0)
+                                        (brace-list-open . 0)
+                                        (statement-case-open . 0)
+                                        (substatement-open . 0)
+                                        (topmost-intro-cont . 0)))))
+
+     (defun moritz/c-mode-hook ()
+       "My basic config for c-like languages"
+       (setq c-default-style "moritz"))
+     (add-hook 'c-mode-hook 'moritz/c-mode-hook)
+     (add-hook 'omnisharp-mode-hook 'moritz/c-mode-hook)
+   #+end_src
+** Javascript
+
+#+begin_src emacs-lisp
+  (use-package js2-mode
+    :ensure t
+    :init
+    (load "~/.emacs.d/prog-mode")
+    (load "~/.emacs.d/js")
+    (setq-default js-indent-align-list-continuation nil)
+    :config
+    (defun moritz/js-mode ()
+      "JS config"
+      (electric-pair-mode)
+      (subword-mode)
+      (js2-mode-hide-warnings-and-errors)
+      (smart-tabs-advice js2-indent-line js2-basic-offset)
+      (setq indent-tabs-mode nil))
+    (add-hook 'js2-mode-hook 'moritz/js-mode)
+    (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+    (add-to-list 'interpreter-mode-alist '("node" . js2-mode)))
+#+end_src
+
+#+begin_src emacs-lisp
+  (defun moritz/load-indium ()
+    "Loads and configure indium package"
+    (interactive)
+    (use-package indium
+      :ensure t))
+#+end_src
+** Python Jedi
+   I couldn't find out how to inactivate auto-complete for python while leave it on for other major modes like js2.
+
+   To use company jedi with company, you cannot install jedi package. Install only company and company-jedi.
+
+#+begin_src emacs-lisp
+  (defun moritz/load-jedi ()
+    "Load and configure jedi package"
+    (interactive)
+    (use-package jedi
+      :ensure t
+      :config
+      (add-hook 'python-mode-hook 'jedi:setup)))
+
+
+  ;; (use-package company-jedi
+  ;;   :ensure t
+  ;;   :config
+  ;;   (defun moritz-python-mode-hook ()
+  ;;     "Defines a autocompletion configuration hook for python"
+  ;;     (add-to-list 'company-backends 'company-jedi))
+  ;;   (add-hook 'python-mode-hook 'moritz-python-mode-hook))
+
+
+#+end_src
+** Processing
+*** File types
+    #+begin_src emacs-lisp
+      (add-to-list 'auto-mode-alist '("\\.pyde$" . python-mode))
+      (add-to-list 'auto-mode-alist '("\\.pde$" . java-mode))
+    #+end_src
+** Flycheck
+#+begin_src emacs-lisp
+  (use-package flycheck
+    :ensure t
+    :diminish 'flycheck-mode
+    :config
+    (global-flycheck-mode t)
+
+    ;;(add-hook 'emacs-lisp-mode-hook 'flycheck-mode)
+    ;;(add-hook 'python-mode-hook 'flycheck-mode)
+    ;; (add-hook 'js2-mode-hook 'flycheck-mode)
+
+    (setq flycheck-idle-change-delay 1)
+    (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc))
+
+    ;; workaround to keep using inactive timestamps alongs
+    (define-key flycheck-mode-map (kbd "C-c ! !") 'org-time-stamp-inactive))
+#+end_src
+
+** Magit
+
+#+begin_src emacs-lisp
+  (use-package magit
+    :ensure t
+    :config
+    (setq magit-diff-paint-whitespace t)
+    (setq magit-diff-refine-hunk 'all)
+    :bind
+    ("C-x g" . magit-status)
+    ("C-x M-g" . magit-dispatch-popup))
+
+#+end_src
+
+** Git Time Machine
+   #+begin_src emacs-lisp
+     (use-package git-timemachine
+       :ensure t)
+   #+end_src
+
+** Yasnippet
+   #+begin_src emacs-lisp
+     (use-package yasnippet
+       :ensure t
+       :diminish 'yas-minor-mode
+       :config
+       (yas-global-mode 1)
+       (setq yas-fallback-behavior t))
+   #+end_src
+
+   #+begin_src emacs-lisp
+     (use-package auto-yasnippet
+       :ensure t
+       :config
+       (defhydra hydra-auto-yasnippet ()
+         "Auto snippet"
+         ("c" aya-create "create" :color red)
+         ("e" aya-expand "expand" :color red)))
+   #+end_src
+
+** Company
+#+begin_src emacs-lisp
+  (defun moritz/load-company ()
+    "Load company package"
+    (interactive)
+    (use-package company
+      :ensure t
+      :diminish 'company-mode
+      :config
+      (add-hook 'after-init-hook 'global-company-mode)
+      ;; company downcases camelCase
+      (setq-local company-dabbrev-downcase nil)))
+#+end_src
+
+** Omnisharp
+   This is the part of my programming environment with more moving parts. They usually don't work together unless all piece of software are properly installed. To make it work, follow the instructions [[https://github.com/OmniSharp/omnisharp-emacs][here]].
+   - Install [[https://www.microsoft.com/net/download/linux][.NET Core SDK]]
+   - Install Mono following the instructions [[http://www.mono-project.com/download/][here]]
+   - Install NuGet package manager to restore .NET Framework dependencies
+   - Install Omnisharp package (this following piece of code does that)
+   - Install Omnisharp server with M-x omnisharp-install-server
+   - Make sure you have the proper .NET SDK installed according with your project
+   - Make sure you have restored your project's dependencies
+
+#+begin_src emacs-lisp
+  (defun moritz/load-omnisharp ()
+    "Loads and configure omnisharp package"
+    (interactive)
+    (use-package omnisharp
+      :ensure t
+      :config
+      (require 'company)
+      (defun my-csharp-mode ()
+        "Pretty documentation string."
+        (add-to-list 'company-backends 'company-omnisharp)
+        (yas-minor-mode)
+        (hs-minor-mode)
+        (omnisharp-mode)
+        (company-mode)
+        (flycheck-mode)
+        (linum-mode)
+        (subword-mode)
+        (electric-pair-mode)
+        (setq tab-width 4)          ; and 4 char wide for TAB
+        (eldoc-mode))
+
+      (setq eldoc-idle-delay 0.1
+            flisplay-errors-delay 0.2
+            omnisharp-company-strip-trailing-brackets nil)
+
+      (add-hook 'csharp-mode-hook 'my-csharp-mode)
+      (setq flycheck-idle-change-delay 2)
+      (setq omnisharp-server-executable-path "~/.emacs.d/.cache/omnisharp/server/v1.26.0/run")))
+  ;; (moritz/load-omnisharp)
+#+end_src
+
+** Expand-Region
+
+#+begin_src emacs-lisp
+  (use-package expand-region
+    :ensure t
+    :config
+    (global-set-key (kbd "C-=") 'er/expand-region))
+#+end_src
+
+** Web
+*** Emmet
+   Emmet for web programming
+
+#+begin_src emacs-lisp
+  (use-package emmet-mode
+    :ensure t
+    :config
+    (add-hook 'sgml-mode-hook 'emmet-mode)
+    (add-hook 'css-mode-hook  'emmet-mode))
+#+end_src
+*** Simple Httpd
+#+begin_src emacs-lisp
+  (use-package simple-httpd
+    :ensure t)
+#+end_src
+
+*** Multi-Major-Mode mode
+
+#+begin_src emacs-lisp
+  (defun moritz/load-mmm ()
+    "Loads and configure mmm package"
+    (interactive)
+    (use-package mmm-mode
+      :ensure t
+      :config
+      (setq mmm-global-mode 'maybe)
+      (load-library "mmm-auto")
+      (add-to-list 'auto-mode-alist '("\\.phtml$" . sgml-mode))
+      (mmm-add-mode-ext-class 'sgml-mode "\\.phtml\\'" 'html-php)
+      (mmm-add-mode-ext-class 'sgml-mode "\\.phtml\\'" 'html-js)
+      (mmm-add-mode-ext-class 'html-mode nil 'html-js)))
+#+end_src
+
+** Multiple-cursors
+
+#+begin_src emacs-lisp
+  (when (< emacs-major-version 26)
+    (use-package multiple-cursors
+      :ensure t
+      :config
+      (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+
+      (global-set-key (kbd "C->") 'mc/mark-next-like-this)
+      (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+      (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
+      (defhydra hydra-mc ()
+        "Multiple cursors"
+        ("l" mc/edit-lines)
+        ("n" mc/mark-next-like-this)
+        ("N" mc/skip-to-next-like-this)
+        ("p" mc/mark-previous-like-this)
+        ("P" mc/skip-to-previous-like-this))))
+
+
+
+#+end_src
+
+** Emacs lisp
+#+NAME: Paredit
+#+begin_src emacs-lisp
+  (use-package paredit
+    :ensure t
+    :config
+    (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
+    (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
+    (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+    (add-hook 'ielm-mode-hook             #'enable-paredit-mode)
+    (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
+    (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+    (add-hook 'scheme-mode-hook           #'enable-paredit-mode))
+#+end_src
+
+#+RESULTS: Paredit
+: t
+
+** Hungry Delete
+
+#+begin_src emacs-lisp
+  (use-package hungry-delete
+    :ensure t
+    :config
+    (add-hook 'js2-mode-hook 'hungry-delete-mode)
+    (add-hook 'python-mode-hook 'hungry-delete-mode)
+    (add-hook 'emacs-lisp-mode-hook 'hungry-delete-mode)
+    (add-hook 'csharp-mode-hook 'hungry-delete-mode)
+    (add-hook 'sgml-mode-hook 'hungry-delete-mode)
+    (add-hook 'css-mode-hook  'hungry-delete-mode)
+    (add-hook 'ng2-ts-mode-hook  'hungry-delete-mode)
+    (add-hook 'java-mode-hook 'hungry-delete-mode)
+    (add-hook 'omnisharp-mode-hook 'hungry-delete-mode))
+
+#+end_src
+
+** Aggressive Indent
+
+#+begin_src emacs-lisp
+  (use-package aggressive-indent
+    :ensure t
+    :config
+    (add-hook 'emacs-lisp-mode-hook #'aggressive-indent-mode)
+    ;; (add-hook 'python-mode-hook #'aggressive-indent-mode)
+    (add-hook 'js2-mode-hook #'aggressive-indent-mode)
+    (add-hook 'ng2-ts-mode-hook #'aggressive-indent-mode))
+#+end_src
+
+** Auto Complete
+    Trying to use company as default auto-completion engine. If I fail, uncomment two first lines.
+
+ #+begin_src emacs-lisp
+   (defun moritz/load-auto-complete ()
+     "Loads and configure auto-complete package"
+     (interactive)
+     (use-package auto-complete
+       :ensure t
+       :diminish 'auto-complete-mode
+       :config
+       (ac-config-default))
+
+     (use-package ac-js2
+       :ensure t
+       :config
+       (add-hook 'js2-mode-hook 'ac-js2-setup-auto-complete-mode)
+       (add-hook 'js2-mode-hook 'ac-js2-mode)
+       (setq ac-js2-evaluate-calls t)))
+
+   (moritz/load-auto-complete)
+ #+end_src
+
+** Rest Client
+   #+begin_src emacs-lisp
+     (use-package restclient
+       :ensure t
+       :config
+       (add-to-list 'auto-mode-alist '("\\.rest$" . restclient-mode)))
+   #+end_src
+** Indentation
+    This is pretty, but are a little rigid. I still need a better configuration.
+*** Smart tabs
+ #+begin_src emacs-lisp
+   (defun moritz/load-smart-tabs ()
+     "Loads and configure smart-tabs package"
+     (interactive)
+     (use-package smart-tabs-mode
+       :ensure t
+       :config
+       ;;(define-key global-map (kbd "RET") 'newline-and-indent)
+       (setq-default tab-width 2)
+
+       ;; disable tabs globally and reactivate for CC Mode
+       (setq-default indent-tabs-mode nil)
+       (add-hook 'c-mode-common-hook
+                 (lambda () (setq indent-tabs-mode t)))
+
+       (smart-tabs-add-language-support c++ c++-mode-hook
+         ((c-indent-line . c-basic-offset)
+          (c-indent-region . c-basic-offset)))
+
+       (setq js-indent-level 2)
+       (smart-tabs-advice js2-indent-line js2-basic-offset)
+       ;;(smart-tabs-insinuate 'c 'javascript)
+       (smart-tabs-insinuate 'c)))
+
+   (moritz/load-smart-tabs)
+ #+end_src
+*** Web
+ #+begin_src emacs-lisp
+   (add-hook 'css-mode-hook
+             (lambda ()
+               (setq indent-tabs-mode t)
+               (setq tab-width 2)
+               (setq css-indent-offset 2)))
+ #+end_src
+** Typescript
+   #+begin_src emacs-lisp
+     (defun moritz/load-ng2-mode ()
+       "Loads and configure ng2-mode package"
+       (interactive)
+       (use-package ng2-mode
+         :ensure t
+         :config
+         (add-hook 'typescript-mode-hook 'subword-mode)
+         (setq typescript-indent-level 2)))
+   #+end_src
+** Java
+   Set the jar dir in [[file:local.org::*Variables][local.org]].
+   #+begin_src emacs-lisp
+     (defun moritz/load-jdee ()
+       "Loads and configure jdee package"
+       (interactive)
+       (use-package jdee
+         :ensure t
+         :config
+         ;; (setq jdee-server-dir "/home/marcos/myJars")
+         ))
+   #+end_src
+*** Basic
+**** JDK
+      #+NAME: install openjdk
+      #+BEGIN_SRC shell
+      sudo apt-get install openjdk-8-jdk
+      #+END_SRC
+
+**** Maven3
+    #+NAME: Install maven3
+    #+BEGIN_SRC shell
+      sudo apt-get install maven
+    #+END_SRC
+
+**** $JAVA_HOME
+
+      #+NAME: set $JAVA_HOME
+      #+BEGIN_SRC shell :results output :exports both :dir ../sql
+        cat >> ~/.bashrd
+        JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/"
+      #+END_SRC
+
+*** JDEE Server
+    Follow the instructions [[https://github.com/jdee-emacs/jdee-server][here]].
+*** Makefile
+    From [[http://jdee.sourceforge.net/jdedoc/html/jde-ug/jde-ug.html][Documentation]]
+    #+name: jdee docs makefile
+    #+begin_src makefile
+      JDK = d:/jdk1.2/lib/classes.zip
+      JMATH = d:/jmath/src
+      CLASSPATH = $(JMATH);$(JDK)
+      COMPILER = javac VM = java
+      COPTIONS = -g -deprecation
+      ROPTIONS =
+      CLASSES = Test.class \
+    					  JMathError.class \
+    					  JMathException.class \
+    					  LinearSystem.class
+
+      .SUFFIXES: .java .class
+      all : $(CLASSES)
+      # Rebuild (if necessary) and run the JMath test suite. run: $(CLASSES)
+        $(VM) -classpath "$(CLASSPATH)" jmath.Test
+
+      # Remove all class files from the project directory.
+      clean: rm *.class
+
+      # Implicit rule for making Java class files from Java
+      # source files.
+      .java.class: $(COMPILER) $(COPTIONS) -classpath "$(CLASSPATH)" $?
+    #+end_src
+
+    From [[http://mindbending.org/pt/makefile-para-java][tutorial]]
+    #+name: generic makefile
+    #+begin_src makefile
+      # Ignore isso...
+      space:=$(empty) $(empty)
+
+      # Binários
+      JAVAC=/usr/bin/javac
+      JAVA=/usr/bin/java
+      JAR=/usr/bin/jar
+
+      # Diretórios...
+      BINDIR=bin
+      JARDIR=jars
+
+      # Adicione qualquer classpath externo que você precise
+      USERCLASSPATH=.
+
+      # Criando classpath dinâmico
+      TMPCLASSPATH=$(USERCLASSPATH):$(realpath $(BASE)$(BINDIR))
+      ifneq (,$(wildcard $(jars)/*))
+              CLASSPATH=$(TMPCLASSPATH):$(subst $(space),:,$(foreach jar,$(wildcard $(JARDIR)/*.jar),$(realpath $(jar))))
+      endif
+
+      # Flags de compilação
+      JCFLAGS=-g -d $(BASE)$(BINDIR) -classpath $(CLASSPATH)
+      # Flags de execução
+      JFLAGS=-classpath $(CLASSPATH)
+
+      %.class: %.java
+              $(eval BASE=$(dir $<))
+              rm -rf $(BASE)$(BINDIR) && mkdir $(BASE)$(BINDIR)
+              $(JAVAC) $(JCFLAGS) $*.java
+
+      %: %.class
+              echo $*
+              cd $(BASE)$(BINDIR) && $(JAVA) $(JFLAGS) $(subst /,.,$*)
+
+      %.jar: %.class
+              -mkdir -p $(JARDIR)
+              $(JAR) cfe $(JARDIR)/$(subst /,-,$*.jar) $(subst /,.,$*) -C $(BASE)$(BINDIR)/ .
+
+      clean:
+              -find . -type d -name $(BINDIR) | xargs -I{} rm -rf {}
+              -rm -rf $(JARDIR)
+
+      PHONY: clean
+    #+end_src
+** Markdown
+   #+begin_src emacs-lisp
+     (use-package markdown-mode
+       :ensure t
+       :config
+       (setq markdown-command "pandoc"))
+   #+end_src
+** Clojure
+   #+begin_src emacs-lisp
+     (defun moritz/load-cider ()
+       "Loads and configure cider package"
+       (interactive)
+       (use-package cider
+         :ensure t
+         :config
+         (add-hook 'clojure-mode-hook 'paredit-mode)
+         (add-hook 'cider-repl-mode-hook 'paredit-mode))
+
+       (use-package ac-cider
+         :ensure t
+         :config
+         (add-hook 'cider-mode-hook 'ac-flyspell-workaround)
+         (add-hook 'cider-mode-hook 'ac-cider-setup)
+         (add-hook 'cider-repl-mode-hook 'ac-cider-setup)
+         (eval-after-load "auto-complete"
+           '(progn
+              (add-to-list 'ac-modes 'cider-mode)
+              (add-to-list 'ac-modes 'cider-repl-mode)))))
+
+   #+end_src
+** Cask
+   #+BEGIN_SRC emacs-lisp
+     (use-package cask
+       :ensure t
+       :config
+       (cask-initialize))
+   #+END_SRC
+** hs-minor-mode
+   #+BEGIN_SRC emacs-lisp
+     (global-set-key (kbd "C-<tab>") 'hs-toggle-hiding)
+     (defhydra hydra-hide-show ()
+       "Hide/show things"
+       ("<tab>" hs-toggle-hiding "toggle hiding" :color red)
+       ("h" hs-hide-block "hide block" :color red)
+       ("s" hs-show-block "show block" :color red)
+       ("H" hs-hide-all "hide all" :color red)
+       ("S" hs-show-all "show all" :color red)
+       ("l" hs-hide-level "hide level" :color red))
+   #+END_SRC
+* Moritz Functions
+** Alarm clock
+   Based on [[https://ignaciopp.wordpress.com/2009/07/09/roosters-crow-setting-up-an-alarm-clock-in-emacs/][this blog post]].
+   #+begin_src emacs-lisp
+     (defvar alarm-clock-timer nil
+       "Keep timer so that the user can cancel the alarm")
+
+     (defun alarm-clock-message (text)
+       "The actual alarm action"
+       (progn
+         (let((i 0))
+           (while (< i 3)
+             (play-sound-file "~/.emacs.d/test.wav")
+             (setq i (1+ i)))
+           (message-box text))))
+
+     (defun alarm-clock ()
+       "Set an alarm.
+     The time format is the same accepted by `run-at-time'.  For
+     example \"11:30am\"."
+       (interactive)
+       (let ((time (read-string "Time: "))
+             (text (read-string "Alarm message: ")))
+         (progn
+           (setq alarm-clock-timer
+                 (run-at-time time nil 'alarm-clock-message text)))))
+
+     (defun alarm-clock-cancel ()
+       "Cancel the alarm clock"
+       (interactive)
+       (cancel-timer alarm-clock-timer))
+   #+end_src
+** Text Editing
+*** Flush blank lines
+    #+begin_src emacs-lisp
+      (defun moritz/flush-blank-lines ()
+        "flush-lines-with-only-whitespaces"
+        (interactive)
+        (flush-lines "^\s*$"))
+    #+end_src
+** Enforce agenda
+   #+BEGIN_SRC emacs-lisp
+     (require 'timer)
+     (require 'diary-lib)
+
+     ;; Enforce agenda is a way to force some action like email reading
+     ;; code review etc.
+     ;; Use like this
+     ;; (enforce-agenda-add-action "teste"          ;; action name
+     ;;                            "4:50am"         ;; time
+     ;;                            'message         ;; function
+     ;;                            "The name is %s" ;; function arg1
+     ;;                            "Name")          ;; function arg2...
+
+
+     (defvar enforce-agenda--items '())
+
+     ;; public interface
+     (defun enforce-agenda-add-action (name time func &rest func-args)
+       "Set an agenda action."
+       (setq enforce-agenda--items
+             (append enforce-agenda--items
+                     `((,name . ,(apply 'run-at-time
+                                        (if (and (not (car func-args)) (= 1 (length func-args)))
+                                            `(,time ,nil enforce-agenda--action ,func)
+                                          (append `(,time ,nil enforce-agenda--action ,func)
+                                                  func-args))))))))
+
+     (defun enforce-agenda-remove-future-action ()
+       "Remove an action of the enforced agenda items"
+       (interactive)
+       (let* ((items enforce-agenda--items)
+              (remove-future-action-helm-source
+               `((name . "Select the item you want to remove: ")
+                 (candidates . ,(mapcar '(lambda (item)
+                                           `(,(car item) . ,item))
+                                        items))
+                 (action . (lambda (candidate)
+                             (enforce-agenda--remove-future-action (car candidate)))))))
+         (helm :sources '(remove-future-action-helm-source))))
+
+     (defun enforce-agenda-add-action-if-future (name time callback &optional cbargs)
+       (if (time-less-p (current-time) (enforce-agenda--string-to-time time))
+           (enforce-agenda-add-action name
+                                      time
+                                      callback
+                                      cbargs)))
+
+     ;; private functions
+     (defun enforce-agenda--action (&rest args)
+       "Agenda action"
+       (progn
+         (let((i 0))
+           (while (< i 1)
+             (play-sound-file "/usr/share/sounds/speech-dispatcher/test.wav")
+             (setq i (1+ i)))
+           (enforce-agenda--remove-past-actions)
+           (apply (car args) (cdr args)))))
+
+     (defun enforce-agenda--remove-past-actions ()
+       (let ((items enforce-agenda--items)
+             (result '()))
+         (while items
+           (let ((item (car items)))
+             (if (time-less-p (current-time) (timer--time (cdr item)))
+                 (setq result (append result `(,item))))
+             (setq items (cdr items))))
+         (setq enforce-agenda--items result)))
+
+     (defun enforce-agenda--remove-future-action (name)
+       (let ((result '())
+             (itens enforce-agenda--items))
+         (while itens
+           (let ((item (car itens)))
+             (if (not (string= (car item) name))
+                 (setq result (append `(,item) result))
+               (cancel-timer (cdr item))))
+           (setq itens (cdr itens)))
+         (setq enforce-agenda--items result)))
+
+     (defun enforce-agenda--get-future-action-names ()
+       (let ((actions enforce-agenda--items))
+         (mapcar '(lambda (item) (car item)) actions)))
+
+     (defun enforce-agenda--string-to-time (time-string)
+       (let ((hhmm (diary-entry-time time-string))
+             (now (decode-time)))
+         (if (>= hhmm 0)
+             (encode-time 0 (% hhmm 100) (/ hhmm 100) (nth 3 now)
+                          (nth 4 now) (nth 5 now) (nth 8 now)))))
+
+     ;; todo: write tests for it
+     ;; with and without params
+     ;; (defun message-test (&optional test)
+     ;;   "Call `message` with the string 'test' if no parameter was passed
+     ;; or with the passed parameter"
+     ;;   (let ((test (if (not test)
+     ;;                   "test"
+     ;;                 test)))
+     ;;     (message test)))
+     ;; (enforce-agenda-add-action "read-emails-morning"
+     ;;                            "01:42"
+     ;;                            'message-test
+     ;;                            "var")
+   #+END_SRC
+** Browse localhost-at-port
+#+begin_src emacs-lisp
+  (defun moritz/localhost-at-port ()
+    "start browser on localhost at a given port"
+    (interactive)
+    (let ((port (read-string (format "port(%s): " 8080) nil nil "8080")))
+      (browse-url (concat "http://localhost:" port))))
+#+end_src
+** Utilities
+   #+BEGIN_SRC emacs-lisp
+     (require 'thingatpt)
+
+     (defun moritz/format-guid (checksum)
+       (interactive)
+       (save-excursion
+         (let* ((checksum-blocks `(,(substring checksum 0 8)
+                                   ,(substring checksum 8 12)
+                                   ,(substring checksum 12 16)
+                                   ,(substring checksum 16 20)
+                                   ,(substring checksum 20 32))))
+           (mapconcat 'identity checksum-blocks "-"))))
+
+     ;; usage example
+     ;; (moritz/format-guid "e13dc85b8884856ea6c694d89f4895a4")
+   #+END_SRC
+** Kubectl
+   #+BEGIN_SRC emacs-lisp
+     (defun get-kubectl-resource (resource name)
+       "Return a pod with name"
+       (replace-regexp-in-string
+        "\n$" ""
+        (shell-command-to-string
+         (format "kubectl get %s | grep %s | cut -d\" \" -f1"
+                 resource
+                 name))))
+
+     (defun kubectl-resource (resource name)
+       "Return a pod with name"
+       (replace-regexp-in-string "\n$" "" (shell-command-to-string (format "kubectl get %s | grep %s | cut -d\" \" -f1" resource name))))
+
+     (defun list-instances ()
+       "List a gcloud compute engine instance"
+       (shell-command-to-string
+        "gcloud compute instances list"))
+
+     (defun start-instance (name)
+       "Start a gcloud compute engine instance"
+       (replace-regexp-in-string
+        "\n$" ""
+        (shell-command-to-string
+         (format "gcloud compute instances start %s" (get-instance-full-name name)))))
+
+     (defun stop-instance (name)
+       "Stop a gcloud compute engine instance"
+       (replace-regexp-in-string
+        "\n$" ""
+        (shell-command-to-string
+         (format "gcloud compute instances stop %s" (get-instance-full-name name)))))
+
+     (defun get-instance-full-name (name)
+       (replace-regexp-in-string
+        "\n$" ""
+        (shell-command-to-string
+         (format "gcloud compute instances list | grep %s | cut -d\" \" -f1" name))))
+
+     ;; (stop-instance "general-purpose")
+
+   #+END_SRC
+** Org clock today
+   #+BEGIN_SRC emacs-lisp
+     (defun moritz/org-clock-sum-today ()
+       (interactive)
+       "Visit each file in `org-agenda-files' and return the total time of today's
+         clocked tasks in minutes."
+       (let ((files (org-agenda-files))
+             (total 0))
+         (org-agenda-prepare-buffers files)
+         (dolist (file files)
+           (with-current-buffer (find-buffer-visiting file)
+             (setq total (+ total (org-clock-sum-today)))))
+         (message (moritz/format-minutes total))))
+
+     (defun moritz/format-minutes (total)
+       (let* ((negative (< total 0))
+              (total (abs total))
+              (hours (/ total 60))
+              (minutes (- total (* hours 60))))
+         (format (concat (if negative "-" "") "%02d:%02d") hours minutes)))
+
+     (defun moritz/format-seconds (total)
+       (let* ((negative (< total 0))
+              (total (abs (/ total 60)))
+              (hours (/ total 60))
+              (minutes (- total (* hours 60))))
+         (format (concat (if negative "-" "") "%02d:%02d") hours minutes)))
+
+     (defun moritz/format-minutes-load-test-suite ()
+
+       (ert-deftest moritz/format-minutes--test--zero ()
+         "Try to format zero minutes"
+         (should (string= (moritz/format-minutes 0) "00h00min")))
+
+       (ert-deftest moritz/format-minutes--test--less-than-one-hour ()
+         "Positive number of minutes, less than 60"
+         (should (string= (moritz/format-minutes 14) "00h14min")))
+
+       (ert-deftest moritz/format-minutes--test--one-hour ()
+         "Positive number, equal to 60"
+         (should (string= (moritz/format-minutes 60) "01h00min")))
+
+       (ert-deftest moritz/format-minutes--test--round-larger-than-one-hour ()
+         "Positive number, two or more hours without spare minutes"
+         (should (string= (moritz/format-minutes 180) "03h00min")))
+
+       (ert-deftest moritz/format-minutes--test--larger-than-two-hour-with-spare-minutes ()
+         "Positive number, larger than two hours with spare minutes"
+         (should (string= (moritz/format-minutes 225) "03h45min")))
+
+       (ert-deftest moritz/format-minutes--test--larger-than-two-digit-hours ()
+         "Positive number, larger than 6000 minutes"
+         (should (string= (moritz/format-minutes 6100) "101h40min")))
+
+       (ert-deftest moritz/format-minutes--test--negative-zero ()
+         "Negative number, zero - supress sign"
+         (should (string= (moritz/format-minutes -0) "00h00min")))
+
+       (ert-deftest moritz/format-minutes--test--negative-minutes ()
+         "Negative number, less than one hour -14 minutes"
+         (should (string= (moritz/format-minutes -14) "-00h14min")))
+
+       (ert-deftest moritz/format-minutes--test--negative-one-hour ()
+         "Negative number, one hour"
+         (should (string= (moritz/format-minutes -60) "-01h00min")))
+
+       (ert-deftest moritz/format-minutes--test--negative-round-more-than-one-hour ()
+         "Negative number, one hour"
+         (should (string= (moritz/format-minutes -180) "-03h00min")))
+
+       (ert-deftest moritz/format-minutes--test--negative-larger-than-two-hour-with-spare-minutes ()
+         "Positive number, larger than two hours with spare minutes"
+         (should (string= (moritz/format-minutes -225) "-03h45min")))
+
+       (ert-deftest moritz/format-minutes--test--negative-larger-than-two-digit-hours ()
+         "Positive number, larger than 6000 minutes"
+         (should (string= (moritz/format-minutes -6100) "-101h40min"))))
+
+     ;; (moritz/format-minutes-load-test-suite)
+
+
+     ;; (Message (number-to-string (org-clock-sum-custom "" 'thisweek nil)))
+   #+END_SRC
+** Video
+   #+BEGIN_SRC emacs-lisp
+     (defun msg-me (process event)
+       (princ
+        (format "Process: %s had the event '%s'" process event)))
+
+     (defun moritz-video-record (delay)
+       "Start recording a video with audio and half of the screen"
+       (interactive "p")
+       (let ((filename "/tmp/video.mkv")
+             (delay (if delay
+                        delay
+                      0))
+             (process-name "moritz-video-record"))
+         (setq moritz-video--process
+               (apply 'start-process
+                      (append `(,process-name
+                                ,process-name)
+                              (split-string (format "ffmpeg -y -f alsa -i pulse -f x11grab -r 25 -s 960x1056 -i :0.0+0,24 -acodec pcm_s16le -vcodec libx264 -threads 0 -ss %s %s"
+                                                    (number-to-string delay)
+                                                    filename)))))
+         (set-process-sentinel moritz-video--process 'msg-me)))
+
+     (defun moritz-video-fullscreen-record (delay)
+       "Start recording a video with audio and half of the screen"
+       (interactive "p")
+       (let ((filename "/tmp/video.mkv")
+             (delay (if delay
+                        delay
+                      0))
+             (process-name "moritz-video-record"))
+         (setq moritz-video--process
+               (apply 'start-process
+                      (append `(,process-name
+                                ,process-name)
+                              (split-string (format "ffmpeg -y -f alsa -i pulse -f x11grab -r 25 -s %sx%s -i :0.0 -acodec pcm_s16le -vcodec libx264 -threads 0 -ss %s %s"
+                                                    (x-display-pixel-width)
+                                                    (x-display-pixel-height)
+                                                    delay
+                                                    filename)))))
+         (set-process-sentinel moritz-video--process 'msg-me)))
+
+     (defun moritz-video-mute-record (delay)
+       "starts a video recording with half of the screen"
+       (interactive "p")
+       (let ((filename "/tmp/video.mp4")
+             (delay (if delay
+                        delay
+                      0))
+             (process-name "moritz-video-record"))
+         (setq moritz-video--process
+               (apply 'start-process
+                      (append `(,process-name
+                                ,process-name)
+                              (split-string (format "ffmpeg -y -r 30 -s 960x1056 -f x11grab -i :0.0 -vcodec libx264 -qscale 2 -ss %s %s"
+                                                    (number-to-string delay)
+                                                    filename)))))
+         (set-process-sentinel moritz-video--process 'msg-me)))
+
+     (defun moritz-video-stop ()
+       "stops the video recording process"
+       (interactive)
+       (interrupt-process moritz-video--process))
+
+
+     (defun moritz-video-compress ()
+       "Converts last saved video to mp4"
+       (interactive)
+       (let ((input-file "/tmp/video.mkv")
+             (output-file "/tmp/video.mp4")
+             (process-name "moritz-video-compress"))
+         (setq moritz-video--process
+               (apply 'start-process
+                      (append `(,process-name
+                                ,process-name)
+                              (split-string (format "ffmpeg -y -i %s -vcodec libx264 -crf 22 -threads 0 %s"
+                                                    input-file
+                                                    output-file)))))
+         (set-process-sentinel moritz-video--process 'msg-me)))
+
+     (defun moritz-video-play ()
+       "Plays the last saved video"
+       (interactive)
+       (let ((filename "/tmp/video.mp4"))
+         (async-shell-command (format "mplayer %s" filename))))
+
+     (defun moritz-video-browse ()
+       "Plays the last saved video"
+       (interactive)
+       (let ((filename "/tmp/video.mp4"))
+         (async-shell-command (format "nautilus %s" filename))))
+
+     (defhydra hydra-moritz-video ()
+       "Moritz video"
+       ("r" moritz-video-record "Record half-screen")
+       ("f" moritz-video-fullscreen-record "Record fullscreen video")
+       ("c" moritz-video-compress "Compress")
+       ("m" moritz-video-mute-record "Record half-screen mute video")
+       ("p" moritz-video-play "Play last compressed video")
+       ("s" moritz-video-stop "Stop recording video")
+       ("b" moritz-video-browse "Open in nautilus"))
+   #+END_SRC
+** dotnet
+   #+BEGIN_SRC emacs-lisp
+     (defun moritz/webapi-build ()
+       "Build the webapi project"
+       (interactive)
+       (let* ((default-directory "/home/moritz/workspace/webapi/")
+              (project-name "Portal.WebApi")
+              (process-name "webapi-build")
+              (process (start-process process-name process-name "dotnet" "build" project-name)))
+         (set-process-sentinel process
+                               (lambda (process event)
+                                 (message (format "Process %s triggered has %s" process event)))))
+       (message "webapi build started"))
+
+     (defun moritz/webapi-start ()
+       "Start the webapi process"
+       (interactive)
+       (let* ((default-directory "/home/moritz/workspace/webapi/")
+              (project-name "Portal.WebApi")
+              (process-name "webapi-process"))
+         (start-process process-name process-name "dotnet" "run" "-p" project-name))
+       (message "webapi process started"))
+
+     (defun mortiz/webapi-stop ()
+       "Stop the webapi process"
+       (interactive)
+       (let ((project-name "Portal.WebApi"))
+         (interrupt-process (get-process project-name)))
+       (message "webapi process interrupted"))
+   #+END_SRC
+* Shell
+** Multi-term
+   #+begin_src emacs-lisp
+     ;; config in local.org
+     (defvar moritz/use-zsh-in-multi-term t)
+
+     (use-package multi-term
+       :ensure t
+       :config
+       (if
+           moritz/use-zsh-in-multi-term
+           (setq multi-term-program "/usr/bin/zsh")))
+   #+end_src
+** Eshell
+*** Always scroll comint screen to the bottom
+
+    Set this way to keep tail -f tracking the last log entries.
+
+ #+begin_src emacs-lisp
+   (setq comint-scroll-to-bottom-on-output t)
+ #+end_src
+*** Customize eshell history size
+    #+BEGIN_SRC emacs-lisp
+      (setq eshell-history-size 5000)
+    #+END_SRC
+* Games
+** Chess
+   #+begin_src emacs-lisp
+     (defun moritz/load-chess ()
+       "Loads and configure chess package"
+       (interactive)
+       (use-package chess
+         :ensure t))
+   #+end_src
+* Linux specific
+  #+begin_src emacs-lisp
+    (when linux-p
+      (defun moritz/vol-up ()
+        "alsa mixer volume up 5%"
+        (interactive)
+        (shell-command "amixer -D pulse sset Master 5%+"))
+      (defun moritz/vol-down ()
+        "alsa mixer volume down 5%"
+        (interactive)
+        (shell-command "amixer -D pulse sset Master 5%-"))
+      (require 'hydra)
+      (global-set-key (kbd "C-c v v")
+                      (defhydra hydra-volume-control ()
+                        "Volume control"
+                        ("+" moritz/vol-up "Volume up")
+                        ("=" moritz/vol-up)
+                        ("-" moritz/vol-down "Volume down")
+                        ("<kp-subtract>" moritz/vol-down))))
+  #+end_src
+* Hydras awakening
+  #+BEGIN_SRC emacs-lisp
+    (global-set-key (kbd "C-1")
+                    (defhydra hydra-awake-hydras ()
+                      "Choose a hydra to awake: "
+                      ("w" hydra-window-control/body "window control" :color blue)
+                      ("a" hydra-auto-yasnippet/body "auto-yasnippet" :color blue)
+                      ("v" hydra-volume-control/body "volume control" :color blue)
+                      ("e" hydra-evil-nav/body "evil mode" :color blue)
+                      ("m" hydra-mc/body "multiple cursors" :color blue)
+                      ("h" hydra-hide-show/body "hide/show" :color blue)
+                      ("r" hydra-moritz-video/body "video recording" :color blue)
+                      ("l" moritz/localhost-at-port "localhost" :color blue)))
+  #+END_SRC

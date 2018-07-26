@@ -1,0 +1,31 @@
+# -*- mode: snippet -*-
+# name: http
+# key: http_
+# --
+${1:Call the action}
+:PROPERTIES:
+:header-args+: :var method="${2:GET}" :var action="${3:/ptmsafe/users/basic}"
+:END:
+
+#+name: $2${4: action description}
+#+begin_src http :var token=access-token
+  \${method} \${host}\${api_version}\${action}
+  Accept:application/json, text/plain, */*
+  Accept-Encoding:gzip, deflate, sdch
+  Accept-Language:pt-BR,pt;q=0.8,en-US;q=0.6,en;q=0.4
+  Authorization:Bearer \${token}
+  Connection:keep-alive
+  Host:\${host}
+  Origin:http://localhost:8080
+  Referer:http://localhost:8080/
+  User-Agent:Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36
+
+  ${5:Content-Type: application/json
+  {
+    "idUsuarioSistema": 16,
+    "nomeUsuario": "Marcos Moritz",
+    "comentario": "this comment was writen in a test",
+    "fonteSolicitanteID": 2,
+    "modulo": 4
+  }}
+#+end_src

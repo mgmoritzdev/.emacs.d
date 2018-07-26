@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: prop
+# key: prop
+# --
+public ${1:string} ${2:prop} { get; set; }
+$0

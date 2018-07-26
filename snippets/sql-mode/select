@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: sel
+# key: sel
+# --
+SELECT ${1:TOP(1) *} FROM ${2:table} WHERE ${3:id=1};

@@ -1,0 +1,162 @@
+#+TITLE: Local Emacs Config
+#+AUTHOR: Marcos Moritz
+#+DATE: [2017-11-14 Ter 00:45]
+#+PROPERTY: Effort_ALL 0 0:30 1:00 2:00 3:00 5:00 8:00 13:00 21:00
+#+COLUMNS: %40ITEM(Task) %17Effort(Estimated Effort){:} %CLOCKSUM %3PRIORITY
+
+* Basic
+** Visual
+   #+name: fonts
+   #+begin_src emacs-lisp
+     (set-face-attribute 'default nil :font "DejaVuSansMono-12" :height 120 :weight 'normal)
+     ;; (set-face-attribute 'default nil :font "Ubuntu-12" :height 120)
+   #+end_src
+
+   #+begin_src emacs-lisp
+     (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+   #+end_src
+
+   This settings are indeed awesome, but create some annoying flickering
+   #+begin_src emacs-lisp
+     ;; (set-frame-parameter (selected-frame) 'alpha '(75 . 50))
+     ;; (add-to-list 'default-frame-alist '(alpha . (75 . 50)))
+   #+end_src
+* Variables
+  #+begin_src emacs-lisp
+    (setq org-use-speed-commands t)
+    (setq org-default-notes-file (concat "~" "/notes.org"))
+
+    (setq browse-url-browser-function 'browse-url-generic
+          browse-url-generic-program "google-chrome")
+
+    (defvar ivy-initial-inputs-alist
+      '((org-refile . "^")
+        (org-agenda-refile . "^")
+        (org-capture-refile . "^")
+        (counsel-M-x . "")
+        (counsel-describe-function . "^")
+        (counsel-describe-variable . "^")
+        (counsel-org-capture . "^")
+        (Man-completion-table . "^")
+        (woman . "^"))
+      "Command to initial input table.")
+  #+end_src
+* Paths
+* Remmina
+  #+begin_src emacs-lisp
+    (moritz/load-remmina "/home/moritz/.local/share/remmina/")
+  #+end_src
+
+* Dart
+  #+begin_src emacs-lisp
+    (setq dart-enable-analysis-server t)
+  #+end_src
+* Diminish
+  #+BEGIN_SRC emacs-lisp
+    (diminish magit-auto-revert-mode)
+    (diminish 'flycheck-mode)
+    (diminish 'global-flycheck-mode)
+    (diminish 'flyspell-mode)
+    (diminish 'yas-minor-mode)
+    (diminish 'highlight-paren-mode)
+    (diminish 'highlight-parentheses-mode)
+    (diminish 'drag-stuff-mode)
+    (diminish 'auto-complete-mode)
+    (diminish 'hungry-delete-mode)
+  #+END_SRC
+* Jedi
+  #+BEGIN_SRC emacs-lisp
+    (defun load-jedi-virtualenv (dir venv-name)
+      (moritz/load-jedi)
+      (use-package virtualenvwrapper
+        :ensure t
+        :config
+        (setq venv-location '(dir))
+        (venv-workon venv-name)))
+  #+END_SRC
+* Grandshell
+  I made some changes in grandshell to have a more visible refined hunk in diff files
+
+   `(diff-refine-removed ((,class (:inherit magit-diff-removed-highlight :foreground ,red-brightest :background ,red))))
+   `(diff-refine-added ((,class (:inherit magit-diff-added-highlight :foreground ,blue-bright :background ,blue-darker))))
+* Get external IP
+  #+BEGIN_SRC emacs-lisp
+    (defun moritz/get-external-ip ()
+      "Request from external IP to inform my IP"
+      (interactive)
+      (async-shell-command "curl -s checkip.dyndns.org | sed -e 's/.*Current IP Address: //' -e 's/<.*$//'"))
+  #+END_SRC
+* speed type
+  #+BEGIN_SRC emacs-lisp
+    (defun moritz/speed-type-portuguese ()
+      "Use list of portuguese sources"
+      (interactive)
+      (setq speed-type-gb-book-list
+            '(44540 38496 55752 56737 53101 54829 55682 17610 23620)))
+
+    (defun moritz/speed-type-english ()
+      "Use list of portuguese sources"
+      (interactive)
+      (setq speed-type-gb-book-list
+            '(1342 11 1952 1661 74 1232 23 135 5200 2591 844 84 98 2701 1400 16328 174
+                   46 4300 345 1080 2500 829 1260 6130 1184 768 32032 521 1399 55)))
+
+
+  #+END_SRC
+* Find git root
+  #+BEGIN_SRC emacs-lisp
+    (defun is-root-git-directory (directory)
+      (if (member ".git" (directory-files directory)) t nil))
+
+    (defun get-git-root ()
+      "Get the current file git root directory"
+      (interactive)
+      (dig-for-dotgit (get-location)))
+
+    (defun get-location ()
+      "Try to find the best path to run a path dependent function"
+      (let ((file (buffer-file-name))
+            (buffer (buffer-name)))
+        (cond ((file-exists-p file) (expand-file-name file))
+              (buffer (expand-file-name buffer)))))
+
+    (defun dig-for-dotgit (file)
+      (let ((value 0)
+            (directory (file-name-directory file))
+            (git-root nil))
+        (while (and (< value 9) (not git-root))
+          (if (is-root-git-directory directory)
+              (progn
+                (setq git-root directory))
+            (progn (+ value 1)
+                   (setq directory (parent-directory directory)))))
+        (message git-root)))
+
+    (defun parent-directory (directory)
+      (let ((directory (substring directory 0 (- (length directory) 1))))
+        (file-name-directory directory)))
+
+    (defun get-files-in-dir (dir)
+      (let ((default-directory dir))
+        (let ((files (directory-files default-directory))
+              (names-and-files ()))
+          files)))
+  #+END_SRC
+* Eshell
+  #+BEGIN_SRC emacs-lisp
+    (require 'eshell)
+    (require 'em-tramp)
+    (setq eshell-prefer-lisp-functions t)
+    (setq password-cache t)
+    (setq password-cache-expiry 3600)
+    ;; check if which sudo returns this:
+    ;; sudo is an alias, defined as "eshell/sudo $*"
+    ;; if not, run:
+    ;; alias sudo 'eshell/sudo $*'
+  #+END_SRC
+* migration timestamp
+#+BEGIN_SRC emacs-lisp
+  (defun moritz/time ()
+    (interactive)
+    (shell-command-to-string "echo -n $(date +'%Y%m%d%H%M%S')"))
+#+END_SRC

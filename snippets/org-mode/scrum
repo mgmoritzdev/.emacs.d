@@ -1,0 +1,19 @@
+# -*- mode: snippet -*-
+# name: scrum
+# key: scrum
+# --
+#+TITLE: $1
+#+AUTHOR: ${2:Marcos Moritz}
+#+DATE: `(let ((x (org-insert-time-stamp nil t t))))`
+#+PROPERTY: Effort_ALL 0 0:30 1:00 2:00 3:00 5:00 8:00 13:00 21:00
+#+COLUMNS: %40ITEM(Task) %17Effort(Estimated Effort){:} %CLOCKSUM %3PRIORITY
+
+* Sprint Management
+** Sprint planning
+** Daily Scrum
+** Sprint review
+* Sprint Tasks
+* Recurring Tasks
+** Code review
+** Candidates evaluation
+* Misc

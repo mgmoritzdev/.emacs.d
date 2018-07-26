@@ -1,0 +1,14 @@
+# -*- mode: snippet -*-
+# name: class
+# key: class
+# --
+namespace $1
+{
+  public class $2
+  {
+    public $2()
+    {
+      $0
+    }
+  }
+}

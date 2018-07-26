@@ -1,0 +1,19 @@
+# -*- mode: snippet -*-
+# name: dscrum
+# key: ds
+# --
+${1:Monday}
+**** TODO Meeting preparation
+      :PROPERTIES:
+      :Effort:   0:30
+      :END:
+
+      - What I will do today?
+        - [ ] $0
+
+      - Is there any impediments to reach the sprint goal?
+
+**** TODO Meeting
+      :PROPERTIES:
+      :Effort:   0:30
+      :END:

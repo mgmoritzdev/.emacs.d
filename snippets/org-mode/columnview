@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: columnview
+# key: columnview
+# --
+
+#+BEGIN: columnview :hlines 1 :vlines 1 :indent 1 :id "$1"
+
+#+END:

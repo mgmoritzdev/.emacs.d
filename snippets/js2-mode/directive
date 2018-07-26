@@ -1,0 +1,17 @@
+# -*- mode: snippet -*-
+# name: directive
+# key: dir_
+# --
+(function() {
+	'use strict';
+
+	angular.module('${1:module}')
+		.directive('${2:prefixSelector}', ${3:PrefixSelector}Directive);
+
+	$3Directive.$inject = [];
+
+	function $3Directive() {
+    $0
+	}
+
+})();

@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: clockt
+# key: clockt
+# --
+#+BEGIN: clocktable :maxlevel 5 :narrow 120! :scope agenda :tstart "${1:<2018-07-25 Qua 00:00>}" :tend "${2:<2018-07-25 Qua 23:59>}" :formatter moritz/org-clocktable-write :compact
+#+END:

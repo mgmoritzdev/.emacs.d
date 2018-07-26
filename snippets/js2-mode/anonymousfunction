@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: anonymous function
+# key: af
+# --
+(${1:req, res, next}) => {$0}

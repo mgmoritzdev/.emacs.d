@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: UPDATE
+# key: upd
+# --
+
+update [dbo].[${1:table}] set [${2:col1}]=${3:'value1'}, [${4:col2}]=${5:999} where ${6:id=0}

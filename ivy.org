@@ -1,0 +1,304 @@
+#+TITLE: Ivy configuration file for emacs
+#+AUTHOR: Marcos Moritz
+#+DATE: [2018-03-22 Qui 23:59]
+
+* Objective
+The objective of this configuration file is to allow me to switch back and forth between avy and helm. I mean to use it to configure avy, since helm is my default search engine in emacs.
+
+* Config
+  #+begin_src emacs-lisp
+    (if (string= completion-engine "ivy")
+        (progn
+          (use-package ivy
+            :ensure t
+            :diminish (ivy-mode)
+            :bind (("C-x b" . ivy-switch-buffer))
+            :config
+            (ivy-mode 1)
+            (setq ivy-use-virtual-buffers t)
+            (setq ivy-display-style 'fancy))
+          (use-package swiper
+            :ensure try
+            :bind (
+                   ("C-s" . swiper)
+                   ("C-r" . swiper)
+                   ("C-c C-r" . ivy-resume)
+                   ("M-x" . counsel-M-x)
+                   ("M-y" . counsel-yank-pop)
+                   ("C-x C-f" . counsel-find-file))
+            :config
+            (progn
+              (ivy-mode 1)
+              (setq ivy-use-virtual-buffers t)
+              (setq ivy-display-style 'fancy)
+              (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)))
+          (use-package avy
+            :ensure t
+            :bind ("C-:" . avy-goto-char-2))
+          (use-package counsel-projectile
+            :ensure t
+            :config
+            (counsel-projectile-mode))))
+  #+end_src
+* Moritz Functions
+** Remmina
+   #+begin_src emacs-lisp
+     (defun moritz/load-remmina (path)
+       "Loads remmina with right config"
+
+       (setq remmina-dir path)
+
+       ;; Helpers from xah
+       (defun get-string-from-file (filePath)
+         "Return filePath's file content."
+         (with-temp-buffer
+           (insert-file-contents filePath)
+           (buffer-string)))
+
+       (defun read-lines (filePath)
+         "Return a list of lines of a file at filePath."
+         (with-temp-buffer
+           (insert-file-contents filePath)
+           (split-string (buffer-string) "\n" t)))
+
+       (defun moritz/get-remmina-connection-name (file)
+         "Returns the line that contains the remmina connection name"
+         (let ((lines (read-lines file))
+               (name ())
+               (connection-name-regexp "^name="))
+           (while lines
+             (let ((line (car lines)))
+               (if (string-match-p connection-name-regexp line)
+                   (push line name)))
+             (setq lines (cdr lines)))
+           (replace-regexp-in-string connection-name-regexp "" (car name))))
+
+       (defun moritz/get-remmina-connections ()
+         (let ((default-directory remmina-dir))
+           (let ((remmina-files (directory-files default-directory))
+                 (names-and-files ()))
+             (while remmina-files
+               (let ((file (concat (file-name-as-directory default-directory) (car remmina-files))))
+                 (if (string-match-p ".remmina$" file)
+                     (push (cons (moritz/get-remmina-connection-name file) file) names-and-files)))
+               (setq remmina-files (cdr remmina-files)))
+             names-and-files)))
+
+       (defun moritz/start-remmina-connection (connection-file)
+         (start-process connection-file connection-file "remmina" "-c" connection-file))
+
+       ;; Helm config
+       (defun moritz/remmina-helm ()
+         "Starts a remmina connection"
+         (interactive)
+         (helm :sources '(remmina-helm-source)))
+
+       (setq remmina-helm-source
+             `((name . "Remmina connections")
+               (candidates . ,(mapcar 'car (moritz/get-remmina-connections)))
+               (action . (lambda (candidate)
+                           (moritz/start-remmina-connection (cdr (assoc candidate (moritz/get-remmina-connections))))))))
+
+       ;; Ivy functions
+       (defun remmina-candidates-function (str pred _)
+         (let ((candidates (moritz/get-remmina-connections)))
+           (let ((cand-names (mapcar 'car candidates))
+                 (cand-targets (mapcar '(lambda (candidate)
+                                          (cdr candidate))
+                                       candidates)))
+             (cl-mapcar (lambda (s p) (propertize s 'property p))
+                        cand-names
+                        cand-targets))))
+
+       (defun moritz/remmina-ivy ()
+         (interactive)
+         (ivy-read "Remmina connections: "
+                   #'remmina-candidates-function
+                   :action (lambda (candidate)
+                             (moritz/start-remmina-connection (cdr (assoc candidate (moritz/get-remmina-connections)))))))
+
+       (defun remmina ()
+         "Starts a remmina connection"
+         (interactive)
+         (if (string= completion-engine "ivy")
+             (moritz/remmina-ivy)
+           (moritz/remmina-helm))))
+   #+end_src
+** VirtualBox
+   #+begin_src emacs-lisp
+     (defun moritz/get-vm-names ()
+       "Get all vm names"
+       (let ((result (split-string
+                      (shell-command-to-string "VBoxManage list vms")
+                      "\n"))
+             (vm-names '()))
+         (while result
+           (add-to-list
+            'vm-names
+            (replace-regexp-in-string
+             "\""
+             ""
+             (car
+              (split-string
+               (car result)
+               "\" ")))
+            t
+            )
+           (setq result (cdr result)))
+         (nbutlast vm-names)))
+
+     (defun moritz/start-selected-vm (name)
+       "Start a Processing sketch"
+       (start-process name name "VBoxManage" "startvm" name))
+
+     ;; Helm functions
+     (setq vms-helm-source
+           '((name . "vms")
+             (candidates . moritz/get-vm-names)
+             (action . (lambda (candidate)
+                         (moritz/start-selected-vm candidate)))))
+
+     (defun moritz/start-virtualbox-vm-helm ()
+       "Start a vm"
+       (interactive)
+       (helm :sources '(vms-helm-source)))
+
+     ;; Ivy functions
+     (defun moritz/start-virtualbox-vm-ivy ()
+       (interactive)
+       (ivy-read "Virtual Machines: "
+                 (moritz/get-vm-names)
+                 :action (lambda (candidate)
+                           (moritz/start-selected-vm candidate))))
+
+     (defun start-virtualbox-vm ()
+       "Start a virtualbox virtual machine"
+       (interactive)
+       (if (string= completion-engine "ivy")
+           (moritz/start-virtualbox-vm-ivy)
+         (moritz/start-virtualbox-vm-helm)))
+   #+end_src
+** Browser url shortcuts
+   #+begin_src emacs-lisp
+     (defvar moritz/browser-urls
+       '(("jira" . "http://ptmdev.atlassian.net")
+         ("bitbucket" . "http://bitbucket.org")
+         ("slack" . "http://ptmtech.slack.com")
+         ("gmail" . "https://mail.google.com")
+         ("github" . "https://github.com")
+         ("hangouts" . "https://hangouts.google.com")
+         ("drive" . "https://drive.google.com/drive/my-drive")
+         ("scrum" . "https://hangouts.google.com/hangouts/_/portaltelemedicina.com.br/daily-meeting?hl=en&authuser=0")
+         ("gcloud console" . "console.cloud.google.com")
+         ("backlog" . "https://ptmdev.atlassian.net/secure/RapidBoard.jspa?rapidView=5&projectKey=WEB&view=planning")))
+
+       ;; Helm functions
+       (defun moritz/browse-url-helm ()
+         "Open Website"
+         (interactive)
+         (helm :sources '(moritz/browser-helm-source)))
+
+       (defvar moritz/browser-helm-source
+         `((name . "Website to launch")
+           (candidates . ,(mapcar 'car moritz/browser-urls))
+           (action . moritz/browse-assoc)))
+
+       (defun moritz/browse-assoc (candidate)
+         (loop for cand in (helm-marked-candidates)
+               do
+               (browse-url (cdr (assoc cand moritz/browser-urls)))))
+
+       ;; Ivy functions
+       (defun moritz/browser-candidates-function (str pred _)
+         (let ((candidates moritz/browser-urls))
+           (let ((cand-names (mapcar 'car candidates))
+                 (cand-targets (mapcar '(lambda (candidate)
+                                          (cdr candidate))
+                                       candidates)))
+             (cl-mapcar (lambda (s p) (propertize s 'property p))
+                        cand-names
+                        cand-targets))))
+
+       (defun moritz/browse-url-ivy ()
+         (interactive)
+         (ivy-read "Websites to launch: "
+                   #'moritz/browser-candidates-function
+                   :action (lambda (candidate)
+                             (browse-url (cdr (assoc candidate moritz/browser-urls))))))
+
+       (defun browse ()
+         "Launch websites"
+         (interactive)
+         (if (string= completion-engine "ivy")
+             (moritz/browse-url-ivy)
+           (moritz/browse-url-helm)))
+
+       (global-set-key (kbd "C-x j") 'browse)
+   #+end_src
+** Eshell rebind
+   #+name: Customize eshell
+   #+begin_src emacs-lisp
+     ;; Helpers from xah
+     (defun get-string-from-file (filePath)
+       "Return filePath's file content."
+       (with-temp-buffer
+         (insert-file-contents filePath)
+         (buffer-string)))
+
+     (defun read-lines (filePath)
+       "Return a list of lines of a file at filePath."
+       (with-temp-buffer
+         (insert-file-contents filePath)
+         (split-string (buffer-string) "\n" t)))
+
+     (defun moritz/get-zsh-history ()
+       "Gets the commands from zsh history file"
+       (let ((default-directory (substitute-in-file-name "$HOME")))
+         (let ((zsh-history-file (expand-file-name ".zsh_history"))
+               (commands ())
+               (connection-name-regexp "^\: [[:digit:]]*\:[[:digit:]]\;"))
+           (if (file-exists-p zsh-history-file)
+               (let ((lines (read-lines zsh-history-file)))
+                 (while lines
+                   (let ((line (car lines)))
+                     (if (string-match-p connection-name-regexp line)
+                         (push (replace-regexp-in-string connection-name-regexp "" line)
+                               commands)))
+                   (setq lines (cdr lines)))))
+           commands)))
+
+     ;; Helm config
+     (defun moritz/zsh-history-helm ()
+       "Inserts zsh history item"
+       (interactive)
+       (helm :sources '(zsh-history-helm-source)))
+
+     (setq zsh-history-helm-source
+           `((name . "zsh history")
+             (candidates . ,(moritz/get-zsh-history))
+             (action . (lambda (candidate)
+                         (insert candidate)))))
+
+     ;; Ivy functions
+     (defun moritz/zsh-history-ivy ()
+       (interactive)
+       (ivy-read "Inserts zsh history item: "
+                 (moritz/get-zsh-history)
+                 :action (lambda (candidate)
+                           (insert candidate))))
+
+     (defun zsh-history ()
+       "Inserts zsh history item"
+       (interactive)
+       (if (string= completion-engine "ivy")
+           (moritz/zsh-history-ivy)
+         (moritz/zsh-history-helm)))
+
+     (defun moritz/eshell-mode-config ()
+       "For use in `eshell-mode-hook'."
+       (local-set-key (kbd "C-c C-l") 'counsel-esh-history)
+       (local-set-key (kbd "C-c C-z") 'zsh-history))
+
+     ;; add to hook
+     (add-hook 'eshell-mode-hook 'moritz/eshell-mode-config)
+   #+end_src

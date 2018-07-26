@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: sphelp
+# key: sphelp
+# --
+EXEC sp_helptext 'dbo.[${1:sp_name}]';

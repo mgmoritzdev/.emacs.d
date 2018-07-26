@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: paginated
+# key: pag_
+# --
+SELECT *
+  FROM ${1:table}
+  ORDER BY ${2:row} DESC
+OFFSET ${3:10} ROWS
+FETCH NEXT ${4:10} ROWS ONLY;
